@@ -180,12 +180,14 @@ def collect_features(worktree_path):
             r.get("feature", ""),
         ),
     )
-    # Bucket 3 is detected dynamically by parsing Rust structs, NOT from the
-    # bucket_3_core_features.csv that extract_features.py produces — that CSV
-    # comes from a hardcoded Python list which is identical across every tag,
-    # so it would always produce 0 diffs. Cypress coverage for B3 is not
-    # tracked (the hardcoded list carries a fixed status per feature).
-    all_keys.update(detect_b3_fields(worktree_path))
+    # Bucket 3 is read from bucket_3_core_features.csv (the hardcoded core
+    # feature list in extract_features.py). This makes B3 counts and cypress
+    # coverage % match the feature_extraction_report numbers. B3 introductions
+    # over time will be ~flat because the list is identical across tags.
+    slurp(
+        os.path.join(worktree_path, "bucket_3_core_features.csv"),
+        lambda r: (3, "", "", "", r.get("feature", "")),
+    )
 
     return frozenset(all_keys), frozenset(covered_keys)
 

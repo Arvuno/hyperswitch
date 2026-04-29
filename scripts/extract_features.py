@@ -86,11 +86,6 @@ FLOW_MACRO_MAP = {
         "description": "Extend the authorization hold window beyond the connector's default expiry period",
         "endpoint": "POST /payments/{id}/extend_authorization",
     },
-    "default_imp_for_pre_processing_steps": {
-        "feature": "Preprocessing Flow",
-        "description": "Connector-specific setup step before authorization (e.g. session creation, device fingerprinting, BNPL eligibility check)",
-        "endpoint": "POST /payments (internal preprocessing before auth)",
-    },
     "default_imp_for_pre_authenticate_steps": {
         "feature": "Pre-Authentication Flow",
         "description": "3DS enrollment check — queries whether the card is enrolled in 3DS before initiating a challenge",
@@ -532,6 +527,14 @@ def parse_cypress_configs():
     configs = {}
     skip = {"Commons.js", "Modifiers.js", "Utils.js"}
 
+    # Cypress files whose tests actually exercise a different connector module
+    # than the filename suggests. e.g. StripeConnect.js exercises the `stripe`
+    # connector via the split_payments path — there is no `stripeconnect`
+    # module in crates/hyperswitch_connectors/.
+    file_alias = {
+        "stripeconnect": "stripe",
+    }
+
     if not os.path.exists(CYPRESS_DIR):
         return configs
 
@@ -545,7 +548,8 @@ def parse_cypress_configs():
     for fname in os.listdir(CYPRESS_DIR):
         if not fname.endswith(".js") or fname in skip:
             continue
-        connector = fname.replace(".js", "").lower()
+        raw_connector = fname.replace(".js", "").lower()
+        connector = file_alias.get(raw_connector, raw_connector)
         fpath = os.path.join(CYPRESS_DIR, fname)
         with open(fpath) as f:
             content = f.read()
@@ -564,24 +568,37 @@ def parse_cypress_configs():
             features.add("Mandate")
         if "SaveCard" in content:
             features.add("SaveCard")
+        if "split_payments" in content or "SplitPayment" in content:
+            features.add("Split Payments")
+        if "split_refunds" in content or "SplitRefund" in content:
+            features.add("Split Refunds")
 
-        configs[connector] = {"pm_types": pm_types, "features": features}
+        # Merge into existing config if alias was used (e.g. StripeConnect into stripe)
+        existing = configs.get(connector, {"pm_types": set(), "features": set()})
+        existing["pm_types"] |= pm_types
+        existing["features"] |= features
+        configs[connector] = existing
 
-    # Parse INCLUDE lists from Utils.js
+    # Parse INCLUDE and EXCLUDE lists from Utils.js
     include_lists = {}
+    exclude_lists = {}
     if os.path.exists(CYPRESS_UTILS):
         with open(CYPRESS_UTILS) as f:
             utils_content = f.read()
-        # Find INCLUDE section
-        inc_match = re.search(r'INCLUDE:\s*\{(.*?)\}', utils_content, re.DOTALL)
-        if inc_match:
-            inc_body = inc_match.group(1)
-            for list_match in re.finditer(
-                r'(\w+):\s*\[(.*?)\]', inc_body, re.DOTALL
-            ):
+
+        for section_name, target in (("INCLUDE", include_lists), ("EXCLUDE", exclude_lists)):
+            sec_match = re.search(rf'{section_name}:\s*\{{(.*?)\}},?\s*\n\s*(?://|\}})', utils_content, re.DOTALL)
+            if not sec_match:
+                continue
+            sec_body = sec_match.group(1)
+            for list_match in re.finditer(r'(\w+):\s*\[(.*?)\]', sec_body, re.DOTALL):
                 name = list_match.group(1)
                 connectors = re.findall(r'"(\w+)"', list_match.group(2))
-                include_lists[name] = set(c.lower() for c in connectors)
+                target[name] = set(c.lower() for c in connectors)
+
+    # Stash EXCLUDE on include_lists under a sentinel key so callers can use it
+    # without changing the function signature for every existing call site.
+    include_lists["__EXCLUDE__"] = exclude_lists
 
     return configs, include_lists
 
@@ -617,6 +634,9 @@ def get_cypress_status_bucket1(connector, feature, cypress_configs, include_list
         "Incremental Authorization": "INCREMENTAL_AUTH",
         "Overcapture": "OVERCAPTURE",
         "Installments": "CARD_INSTALLMENTS",
+        "Partner Merchant Identifier": "PARTNER_MERCHANT_IDENTIFIER",
+        "Billing Descriptor": "BILLING_DESCRIPTOR",
+        "External 3DS Authentication": "EXTERNAL_THREE_DS",
     }
     if feature in feature_include_map:
         list_name = feature_include_map[feature]
@@ -629,9 +649,23 @@ def get_cypress_status_bucket1(connector, feature, cypress_configs, include_list
         cfg = cypress_configs.get(c, {})
         return "covered" if "Refund" in cfg.get("features", set()) else "not_covered"
 
-    # Network Transaction ID - check NTID proxy tests
+    # Split Payments / Split Refunds — detected from cypress config keywords
+    if feature == "Split Payments":
+        cfg = cypress_configs.get(c, {})
+        return "covered" if "Split Payments" in cfg.get("features", set()) else "not_covered"
+    if feature == "Split Refunds":
+        cfg = cypress_configs.get(c, {})
+        return "covered" if "Split Refunds" in cfg.get("features", set()) else "not_covered"
+
+    # Network Transaction ID — covered if:
+    #   (a) connector uses the NTID proxy MIT test (21-MandatesUsingNTIDProxy.cy.js), OR
+    #   (b) connector is NOT in the agnostic-NTID exclude list (25-ConnectorAgnosticNTID.cy.js
+    #       runs for every connector except those listed)
     if feature == "Network Transaction ID":
         if "MANDATES_USING_NTID_PROXY" in include_lists and c in include_lists["MANDATES_USING_NTID_PROXY"]:
+            return "covered"
+        agnostic_excluded = include_lists.get("__EXCLUDE__", {}).get("CONNECTOR_AGNOSTIC_NTID", set())
+        if c not in agnostic_excluded:
             return "covered"
         return "not_covered"
 

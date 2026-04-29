@@ -36,7 +36,7 @@ OUT_HTML = os.path.join(REPO_ROOT, "dashboard.html")
 
 
 def fetch_series(cutoff_tag=None):
-    """Return list of {tag, b1, b2, b3, b1_covered, b2_covered} dicts, oldest first.
+    """Return list of {tag, b1, b2, b3, b1_covered, b2_covered, b3_covered} dicts, oldest first.
     Filters out tags where extraction didn't work (total features == 0)."""
     conn = sqlite3.connect(DB_PATH)
     sql = """
@@ -46,7 +46,8 @@ def fetch_series(cutoff_tag=None):
             SUM(CASE WHEN bucket = 2 THEN 1 ELSE 0 END) AS b2,
             SUM(CASE WHEN bucket = 3 THEN 1 ELSE 0 END) AS b3,
             SUM(CASE WHEN bucket = 1 AND is_covered = 1 THEN 1 ELSE 0 END) AS b1_covered,
-            SUM(CASE WHEN bucket = 2 AND is_covered = 1 THEN 1 ELSE 0 END) AS b2_covered
+            SUM(CASE WHEN bucket = 2 AND is_covered = 1 THEN 1 ELSE 0 END) AS b2_covered,
+            SUM(CASE WHEN bucket = 3 AND is_covered = 1 THEN 1 ELSE 0 END) AS b3_covered
         FROM tag_snapshots
         {where}
         GROUP BY tag
@@ -58,7 +59,7 @@ def fetch_series(cutoff_tag=None):
     conn.close()
 
     series = []
-    for tag, b1, b2, b3, b1c, b2c in rows:
+    for tag, b1, b2, b3, b1c, b2c, b3c in rows:
         total = (b1 or 0) + (b2 or 0) + (b3 or 0)
         if total == 0:
             continue
@@ -69,6 +70,7 @@ def fetch_series(cutoff_tag=None):
             "b3": b3 or 0,
             "b1_covered": b1c or 0,
             "b2_covered": b2c or 0,
+            "b3_covered": b3c or 0,
         })
     return series
 
@@ -204,7 +206,7 @@ HTML_TEMPLATE = Template("""<!DOCTYPE html>
     <div><strong>Core / Schema</strong> — platform-wide features. Detected as new fields in <code>business_profile</code> / <code>merchant_account</code> Diesel structs.</div>
   </div>
   <div class="row"><span class="swatch" style="background:#6bda8f"></span>
-    <div><strong>Cypress Tests</strong> — features with cypress coverage (Connector Flows + Connector × PM only; Core/Schema cypress coverage is not tracked).</div>
+    <div><strong>Cypress Tests</strong> — features with cypress coverage across all three categories (Connector Flows, Connector × PM, and Core/Schema).</div>
   </div>
 </div>
 
@@ -221,7 +223,7 @@ HTML_TEMPLATE = Template("""<!DOCTYPE html>
   <div class="card">
     <div class="label">Features With Cypress Tests</div>
     <div class="value">$total_covered</div>
-    <div class="delta">$coverage_pct% of Connector Flows + Connector×PM features</div>
+    <div class="delta">$coverage_pct% of all features (Connector Flows + Connector × PM + Core / Schema)</div>
   </div>
   <div class="card">
     <div class="label">Features Introduced (period)</div>
@@ -273,13 +275,13 @@ HTML_TEMPLATE = Template("""<!DOCTYPE html>
 
 <div class="chart-box">
   <h2>Cypress Test Introduction Over Time</h2>
-  <div class="hint">Cumulative count of features that have cypress coverage at each daily tag. Only Connector Flows and Connector × PM are tracked (Core/Schema cypress coverage not detected dynamically).</div>
+  <div class="hint">Cumulative count of features with cypress coverage at each daily tag, across all three categories.</div>
   <canvas id="cypress_chart"></canvas>
 </div>
 
 <div class="chart-box">
   <h2>Cypress Coverage Ratio Over Time</h2>
-  <div class="hint">% of Connector Flow + Connector × PM features that have cypress tests. Moving up = tests catching up to features. Moving down = features outpacing tests.</div>
+  <div class="hint">% of all features that have cypress tests. Moving up = tests catching up to features. Moving down = features outpacing tests.</div>
   <canvas id="ratio_chart"></canvas>
 </div>
 
@@ -327,15 +329,17 @@ line(document.getElementById('features_chart'), [
 ], { y: { stacked: true } });
 
 line(document.getElementById('cypress_chart'), [
-  { label: 'Connector Flows — with cypress',         data: series.map(s => s.b1_covered),
+  { label: 'Connector Flows — with cypress',          data: series.map(s => s.b1_covered),
     borderColor: '#5cc8ff', backgroundColor: 'rgba(92,200,255,0.15)', fill: true, tension: 0.2 },
   { label: 'Connector × Payment Method — with cypress', data: series.map(s => s.b2_covered),
-    borderColor: '#9d7cff', backgroundColor: 'rgba(157,124,255,0.15)', fill: true, tension: 0.2 }
+    borderColor: '#9d7cff', backgroundColor: 'rgba(157,124,255,0.15)', fill: true, tension: 0.2 },
+  { label: 'Core / Schema — with cypress',            data: series.map(s => s.b3_covered),
+    borderColor: '#ffa56c', backgroundColor: 'rgba(255,165,108,0.15)', fill: true, tension: 0.2 }
 ], { y: { stacked: true } });
 
 const ratio = series.map(s => {
-  const total = s.b1 + s.b2;
-  return total === 0 ? 0 : Math.round(((s.b1_covered + s.b2_covered) / total) * 1000) / 10;
+  const total = s.b1 + s.b2 + s.b3;
+  return total === 0 ? 0 : Math.round(((s.b1_covered + s.b2_covered + s.b3_covered) / total) * 1000) / 10;
 });
 line(document.getElementById('ratio_chart'), [
   { label: 'Cypress coverage %', data: ratio,
@@ -411,9 +415,9 @@ def main():
 
     latest = series[-1]
     earliest = series[0]
-    total_b1_b2 = latest["b1"] + latest["b2"]
-    total_covered = latest["b1_covered"] + latest["b2_covered"]
-    coverage_pct = round(100.0 * total_covered / total_b1_b2, 1) if total_b1_b2 else 0.0
+    total_features_latest = latest["b1"] + latest["b2"] + latest["b3"]
+    total_covered = latest["b1_covered"] + latest["b2_covered"] + latest["b3_covered"]
+    coverage_pct = round(100.0 * total_covered / total_features_latest, 1) if total_features_latest else 0.0
 
     # "Introduced in period" totals — filtered to the cutoff window
     conn = sqlite3.connect(DB_PATH)
@@ -444,11 +448,11 @@ def main():
     ).fetchone()[0]
     conn.close()
 
-    # Coverage % at latest vs previous tag (% of Connector Flows + Connector×PM)
+    # Coverage % at latest vs previous tag (across all 3 buckets)
     if len(series) >= 2:
         prev = series[-2]
-        prev_total = prev["b1"] + prev["b2"]
-        prev_cov = prev["b1_covered"] + prev["b2_covered"]
+        prev_total = prev["b1"] + prev["b2"] + prev["b3"]
+        prev_cov = prev["b1_covered"] + prev["b2_covered"] + prev["b3_covered"]
         prev_pct = round(100.0 * prev_cov / prev_total, 1) if prev_total else 0.0
     else:
         prev_pct = coverage_pct

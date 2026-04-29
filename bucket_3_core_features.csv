@@ -67,21 +67,21 @@ Merchant Account Management,Merchant account CRUD operations,POST/GET/PUT /accou
 Business Profile Management,Business profile CRUD operations,POST/GET/PUT /business_profile,api_models/admin.rs,covered,Cypress spec 28-BusinessProfileConfigs,yes,2026-04-21 01:47:56.568
 MCA Management,Merchant connector account CRUD operations,POST/GET/PUT /account/{id}/connectors,api_models/admin.rs,covered,Cypress spec 03-ConnectorCreate,yes,2026-04-21 02:17:32.282
 Browser Info Collection,Browser information for 3DS and fraud detection,POST /payments (browser_info in body),router_request_types.rs:browser_info,covered,Sent in all 3DS payment tests,yes,2026-04-21 03:04:03
-Order Details,Order line item details,POST /payments (order_details in body),api_models/payments.rs:order_details,not_covered,,unknown,
+Order Details,Order line item details,POST /payments (order_details in body),api_models/payments.rs:order_details,not_covered,,no,
 Customer Acceptance,Customer acceptance for mandates/T&C,POST /payments (customer_acceptance in body),api_models/payments.rs:customer_acceptance,covered,Tested in all mandate flows,no,
 Off Session Payments,Off-session (merchant-initiated) payment indicator,POST /payments (off_session=true),api_models/payments.rs:off_session,covered,Tested in MIT mandate flows,yes,2026-04-21 03:02:29
-Feature Metadata,Generic feature metadata on payments,POST /payments (feature_metadata in body),api_models/payments.rs:feature_metadata,not_covered,,unknown,
+Feature Metadata,Generic feature metadata on payments,POST /payments (feature_metadata in body),api_models/payments.rs:feature_metadata,not_covered,,no,
 Connector Metadata,Connector-specific metadata from merchant,POST /payments (connector_metadata in body),api_models/payments.rs:connector_metadata,not_covered,,yes,2026-04-21 03:03:55
 Multiple Capture,Multiple partial captures on a single authorization,POST /payments/{id}/capture (multiple times),router_request_types.rs:multiple_capture_data,not_covered,,no,
 Payout Type,Type of payout (card/bank/wallet),POST /payouts (payout_type in body),api_models/payouts.rs:payout_type,covered,Cypress payout specs,yes,2026-04-21 01:25:42
-Payout Priority,Payout send priority,POST /payouts (priority in body),api_models/payouts.rs:priority,not_covered,,unknown,
+Payout Priority,Payout send priority,POST /payouts (priority in body),api_models/payouts.rs:priority,not_covered,,no,
 Payout Auto Fulfill,Auto-fulfill payout without review,POST /payouts (auto_fulfill=true),api_models/payouts.rs:auto_fulfill,covered,Cypress payout spec 00003,yes,2026-04-21 01:25:42
-Payout Entity Type,Payout entity type classification,POST /payouts (entity_type in body),api_models/payouts.rs:entity_type,not_covered,,unknown,
+Payout Entity Type,Payout entity type classification,POST /payouts (entity_type in body),api_models/payouts.rs:entity_type,not_covered,,no,
 Payout Recurring,Recurring payout indicator,POST /payouts (recurring in body),api_models/payouts.rs:recurring,not_covered,,no,
-Refund Type,Refund type (instant/scheduled),POST /refunds (refund_type in body),api_models/refunds.rs:refund_type,not_covered,,unknown,
+Refund Type,Refund type (instant/scheduled),POST /refunds (refund_type in body),api_models/refunds.rs:refund_type,not_covered,,no,
 Mandate Management,Mandate CRUD and revocation,GET /mandates/{id} + POST /mandates/{id}/revoke,api_models/mandates.rs,covered,Cypress spec 13-ListAndRevokeMandate,yes,2026-04-21 02:50:00
-Payment Manual Update,Manual payment status update by admin,PUT /payments/{id}/manual-update,api_models/payments.rs,not_covered,,unknown,
-Refund Manual Update,Manual refund status update by admin,PUT /refunds/{id}/manual-update,api_models/refunds.rs,not_covered,,unknown,
+Payment Manual Update,Manual payment status update by admin,PUT /payments/{id}/manual-update,api_models/payments.rs,not_covered,,no,
+Refund Manual Update,Manual refund status update by admin,PUT /refunds/{id}/manual-update,api_models/refunds.rs,not_covered,,no,
 Credentials Identifier Mapping,MCA credentials identifier mapping,POST /payments (read during MCA credential lookup),configs table:mcd_{merchant_id},not_covered,,yes,
 Routing Evaluate,Evaluate routing rules without creating payment,POST /routing/evaluate,api_models/routing.rs,not_covered,,yes,2026-04-20 14:24:54.604
 SDK Client Token Generation,Generate SDK session/client tokens for frontend,POST /payments/session_tokens,hyperswitch_interfaces/api.rs,covered,Cypress spec 26-SessionCall,yes,2026-04-21 02:17:05.481
