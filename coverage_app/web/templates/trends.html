@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Trends — Hyperswitch Coverage{% endblock %}
+
+{% block content %}
+<div class="flex items-baseline justify-between mb-3">
+  <div>
+    <h1 class="text-2xl font-semibold">Trends</h1>
+    <p class="text-zinc-400 text-sm">
+      Feature introduction and Cypress coverage over time, regenerated daily by
+      <code class="text-zinc-300">scripts/build_dashboard.py</code>.
+    </p>
+  </div>
+  <a href="/repo/dashboard.html" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">Open in new tab ↗</a>
+</div>
+
+<div class="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden" style="height: calc(100vh - 200px);">
+  <iframe src="/repo/dashboard.html" class="w-full h-full border-0"></iframe>
+</div>
+{% endblock %}

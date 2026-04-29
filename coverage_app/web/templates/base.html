@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-zinc-900 text-zinc-100">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Hyperswitch Coverage{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    table.coverage tbody tr:hover { background: #27272a; }
+    table.coverage td.cell:hover { background: #3f3f46; cursor: pointer; }
+    .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; }
+    .pill-covered      { background: #16653433; color: #6bda8f; }
+    .pill-not_covered  { background: #7f1d1d33; color: #f87171; }
+    .pill-no_cypress_config { background: #44403c33; color: #d4d4d4; }
+    .pill-yes  { background: #16653433; color: #6bda8f; }
+    .pill-no   { background: #7f1d1d33; color: #f87171; }
+    .pill-unknown { background: #44403c33; color: #d4d4d4; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="border-b border-zinc-800 bg-zinc-950">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-6">
+      <a href="/" class="font-semibold text-lg">Hyperswitch Coverage</a>
+      <nav class="flex gap-4 text-sm text-zinc-400">
+        <a href="/" class="hover:text-white">Home</a>
+        <a href="/bucket-1" class="hover:text-white">Connector Flows</a>
+        <a href="/bucket-2" class="hover:text-white">Connector × PM</a>
+        <a href="/bucket-3" class="hover:text-white">Core / Schema</a>
+        <a href="/trends" class="hover:text-white">Trends</a>
+      </nav>
+      <div class="ml-auto text-xs text-zinc-500">
+        {% if last_run %}
+          Last pipeline run: <span class="text-zinc-300">{{ last_run.started_at }}</span>
+          ({{ last_run.status }}, {{ last_run.triggered_by }})
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-6">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

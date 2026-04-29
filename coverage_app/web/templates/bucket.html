@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ bucket_name }} — Hyperswitch Coverage{% endblock %}
+
+{% block content %}
+<div class="flex items-baseline justify-between mb-4">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ bucket_name }}</h1>
+    <p class="text-zinc-400 text-sm">{{ bucket_description }} · {{ rows|length }} rows</p>
+  </div>
+  <div class="text-xs text-zinc-500">
+    Click any cell in <strong>Assignee</strong>, <strong>Coverage Status</strong>, <strong>Status</strong>, or <strong>Notes</strong> to edit.
+  </div>
+</div>
+
+<form method="get" class="bg-zinc-900 border border-zinc-800 rounded-lg p-3 mb-4 flex flex-wrap gap-2 text-sm">
+  <input type="text" name="q" value="{{ filters.q }}" placeholder="Search…"
+         class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 w-48"/>
+
+  <select name="connector" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1">
+    <option value="">All connectors</option>
+    {% for c in connectors %}<option value="{{ c }}" {% if filters.connector == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+  </select>
+
+  <select name="cypress" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1">
+    <option value="">Cypress: any</option>
+    <option value="covered" {% if filters.cypress == 'covered' %}selected{% endif %}>covered</option>
+    <option value="not_covered" {% if filters.cypress == 'not_covered' %}selected{% endif %}>not_covered</option>
+    <option value="no_cypress_config" {% if filters.cypress == 'no_cypress_config' %}selected{% endif %}>no_cypress_config</option>
+  </select>
+
+  <select name="prod" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1">
+    <option value="">Prod: any</option>
+    <option value="yes" {% if filters.prod == 'yes' %}selected{% endif %}>yes</option>
+    <option value="no"  {% if filters.prod == 'no'  %}selected{% endif %}>no</option>
+    <option value="unknown" {% if filters.prod == 'unknown' %}selected{% endif %}>unknown</option>
+  </select>
+
+  <select name="assignee" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1">
+    <option value="">Assignee: any</option>
+    <option value="__unassigned__" {% if filters.assignee == '__unassigned__' %}selected{% endif %}>— unassigned —</option>
+    {% for a in assignees %}<option value="{{ a }}" {% if filters.assignee == a %}selected{% endif %}>{{ a }}</option>{% endfor %}
+  </select>
+
+  <select name="status" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1">
+    <option value="">Coverage Status: any</option>
+    {% for s in coverage_statuses %}<option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+
+  <button class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded">Apply</button>
+  <a href="/bucket-{{ bucket_id }}" class="text-zinc-400 hover:text-white px-2 py-1">Reset</a>
+</form>
+
+<div class="bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto">
+  <table class="coverage w-full text-sm">
+    <thead class="bg-zinc-950 text-zinc-400 text-xs uppercase tracking-wider">
+      <tr>
+        <th class="text-left px-3 py-2">Connector</th>
+        {% if bucket_id == 2 %}
+        <th class="text-left px-3 py-2">PM</th>
+        <th class="text-left px-3 py-2">PMT</th>
+        {% endif %}
+        <th class="text-left px-3 py-2">Feature</th>
+        <th class="text-left px-3 py-2">Cypress</th>
+        <th class="text-left px-3 py-2">Prod</th>
+        <th class="text-left px-3 py-2">Assignee</th>
+        <th class="text-left px-3 py-2">Coverage Status</th>
+        <th class="text-left px-3 py-2">Status</th>
+        <th class="text-left px-3 py-2">Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr class="border-t border-zinc-800">
+        <td class="px-3 py-2">{{ r.connector or '—' }}</td>
+        {% if bucket_id == 2 %}
+        <td class="px-3 py-2">{{ r.pm or '—' }}</td>
+        <td class="px-3 py-2">{{ r.pmt or '—' }}</td>
+        {% endif %}
+        <td class="px-3 py-2">
+          {{ r.feature }}
+          {% if r.description %}<div class="text-xs text-zinc-500">{{ r.description }}</div>{% endif %}
+        </td>
+        <td class="px-3 py-2"><span class="pill pill-{{ r.cypress_status }}">{{ r.cypress_status }}</span></td>
+        <td class="px-3 py-2"><span class="pill pill-{{ r.prod_used }}">{{ r.prod_used }}</span></td>
+
+        <td class="cell px-3 py-2" data-id="{{ r.id }}" data-column="assignee"
+            hx-trigger="click" hx-get="/api/issues/{{ r.id }}/cell-edit?column=assignee" hx-swap="outerHTML">
+          {% if r.assignee %}{{ r.assignee }}{% else %}<span class="text-zinc-500 italic">—</span>{% endif %}
+        </td>
+        <td class="cell px-3 py-2" data-id="{{ r.id }}" data-column="coverage_status"
+            hx-trigger="click" hx-get="/api/issues/{{ r.id }}/cell-edit?column=coverage_status" hx-swap="outerHTML">
+          {% if r.coverage_status %}{{ r.coverage_status }}{% else %}<span class="text-zinc-500 italic">—</span>{% endif %}
+        </td>
+        <td class="cell px-3 py-2" data-id="{{ r.id }}" data-column="status"
+            hx-trigger="click" hx-get="/api/issues/{{ r.id }}/cell-edit?column=status" hx-swap="outerHTML">
+          {{ r.status }}
+        </td>
+        <td class="cell px-3 py-2" data-id="{{ r.id }}" data-column="notes"
+            hx-trigger="click" hx-get="/api/issues/{{ r.id }}/cell-edit?column=notes" hx-swap="outerHTML">
+          {% if r.notes %}{{ r.notes }}{% else %}<span class="text-zinc-500 italic">—</span>{% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="10" class="text-center text-zinc-500 py-8">No rows match the current filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

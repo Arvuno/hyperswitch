@@ -28,6 +28,7 @@ only.
 import os
 import csv
 import sys
+import sqlite3
 
 try:
     from openpyxl import Workbook
@@ -35,6 +36,8 @@ try:
     HAS_OPENPYXL = True
 except ImportError:
     HAS_OPENPYXL = False
+
+DB_PATH = None  # set in main()
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOME = os.path.expanduser("~")
@@ -282,6 +285,59 @@ def regenerate_report():
           f"(now includes assigned / manual_covered / manual_review / manual_blocked)")
 
 
+def sync_to_db(merged_files):
+    """
+    Push the human-curated columns (assignee, coverage_status) from the
+    merged CSVs into the issues table — but ONLY for cells where the DB
+    is currently NULL/empty. This prevents overwriting edits made through
+    the web app.
+    """
+    db = os.path.join(REPO_ROOT, "features.db")
+    if not os.path.exists(db):
+        print("  (skipping DB sync — features.db not found)")
+        return
+    conn = sqlite3.connect(db)
+    if not [r for r in conn.execute("PRAGMA table_info(issues)").fetchall() if r[1] == "assignee"]:
+        print("  (skipping DB sync — old issues schema; run extract_features.py first)")
+        conn.close()
+        return
+
+    total_synced = 0
+    for path, bucket, key_fields in merged_files:
+        if not os.path.exists(path):
+            continue
+        with open(path, newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        for r in rows:
+            assignee = (r.get("Assignee") or "").strip() or None
+            coverage_status = (r.get("Coverage Status") or "").strip() or None
+            if assignee is None and coverage_status is None:
+                continue
+            key_vals = {k: (r.get(k) or "") for k in key_fields}
+            conditions = ["bucket = ?"]
+            params = [bucket]
+            for col in ("connector", "pm", "pmt"):
+                conditions.append(f"{col} = ?")
+                params.append(key_vals.get(col, ""))
+            conditions.append("feature = ?")
+            params.append(key_vals.get("feature", ""))
+
+            cur = conn.execute(
+                f"""UPDATE issues
+                    SET assignee        = COALESCE(NULLIF(assignee, ''),        ?),
+                        coverage_status = COALESCE(NULLIF(coverage_status, ''), ?),
+                        updated_at      = CURRENT_TIMESTAMP
+                    WHERE {' AND '.join(conditions)}
+                      AND (assignee IS NULL OR assignee = ''
+                           OR coverage_status IS NULL OR coverage_status = '')""",
+                [assignee, coverage_status] + params,
+            )
+            total_synced += cur.rowcount
+    conn.commit()
+    conn.close()
+    print(f"  features.db: {total_synced} rows received initial assignee/coverage_status from Downloads")
+
+
 def main():
     print(f"Loading current CSVs from {REPO_ROOT}", file=sys.stderr)
     print(f"Loading Downloads files from {DOWNLOADS}", file=sys.stderr)
@@ -306,6 +362,12 @@ def main():
     )
 
     regenerate_report()
+
+    sync_to_db([
+        (OUT_B1, 1, ("connector", "feature")),
+        (OUT_B2, 2, ("connector", "payment_method", "payment_method_type", "feature")),
+        (OUT_B3, 3, ("feature",)),
+    ])
 
     print()
     print("Done. Merged outputs:")

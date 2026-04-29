@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Hyperswitch Coverage — Home{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-semibold mb-1">Feature Coverage Dashboard</h1>
+<p class="text-zinc-400 text-sm mb-6">
+  Inventory and cypress-coverage tracker for Hyperswitch.
+  Inline-edit Assignee, Coverage Status, status, and notes.
+  Scheduler refreshes the data daily at 10am IST.
+</p>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+  <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
+    <div class="text-xs uppercase tracking-wider text-zinc-500">Total Features</div>
+    <div class="text-3xl font-semibold mt-1">{{ totals.total }}</div>
+    <div class="text-xs text-zinc-400 mt-2">across all 3 buckets</div>
+  </div>
+  <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
+    <div class="text-xs uppercase tracking-wider text-zinc-500">Cypress Coverage</div>
+    <div class="text-3xl font-semibold mt-1">{{ totals.cypress_pct }}%</div>
+    <div class="text-xs text-zinc-400 mt-2">{{ totals.cypress_covered }} of {{ totals.total }} features have cypress tests</div>
+  </div>
+  <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
+    <div class="text-xs uppercase tracking-wider text-zinc-500">Production Usage</div>
+    <div class="text-3xl font-semibold mt-1">{{ totals.prod_pct }}%</div>
+    <div class="text-xs text-zinc-400 mt-2">{{ totals.prod_yes }} used / {{ totals.prod_no }} unused (denominator excludes unknown)</div>
+  </div>
+</div>
+
+<h2 class="text-lg font-medium mb-3">Buckets</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+  {% for bid, b in buckets.items() %}
+    {% set s = stats[bid] %}
+    <a href="/bucket-{{ bid }}" class="bg-zinc-900 border border-zinc-800 rounded-lg p-5 hover:bg-zinc-800 transition">
+      <div class="text-xs uppercase tracking-wider text-zinc-500">Bucket {{ bid }}</div>
+      <div class="text-lg font-medium mt-1">{{ b.name }}</div>
+      <div class="text-xs text-zinc-400 mt-1">{{ b.description }}</div>
+      <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
+        <div><span class="text-zinc-500">Total:</span> <span class="text-zinc-200">{{ s.total }}</span></div>
+        <div><span class="text-zinc-500">Cypress:</span> <span class="text-zinc-200">{{ s.cypress_pct }}%</span></div>
+        <div><span class="text-zinc-500">Prod:</span> <span class="text-zinc-200">{{ s.prod_pct }}%</span></div>
+        <div><span class="text-zinc-500">Assigned:</span> <span class="text-zinc-200">{{ s.assigned }}</span></div>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+
+<h2 class="text-lg font-medium mb-3">Pipeline</h2>
+<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-5 flex items-center justify-between">
+  <div class="text-sm text-zinc-400">
+    {% if last_run %}
+      Last run: <span class="text-zinc-200">{{ last_run.started_at }}</span> —
+      <span class="{% if last_run.status == 'success' %}text-green-400{% elif last_run.status == 'failed' %}text-red-400{% else %}text-yellow-400{% endif %}">
+        {{ last_run.status }}
+      </span>
+      ({{ last_run.triggered_by }})
+    {% else %}
+      No pipeline runs recorded yet — scheduler will run at 10am IST.
+    {% endif %}
+  </div>
+  <button hx-post="/api/admin/run-pipeline" hx-swap="none"
+          class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-3 py-1.5 rounded">
+    Run pipeline now
+  </button>
+</div>
+{% endblock %}

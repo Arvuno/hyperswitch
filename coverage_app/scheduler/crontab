@@ -1,0 +1,3 @@
+# Run the daily pipeline at 10:00 IST. The container's TZ is set to Asia/Kolkata
+# in the Dockerfile, so this fires at local 10am.
+0 10 * * * root /usr/local/bin/run_pipeline.sh >> /var/log/cron.log 2>&1

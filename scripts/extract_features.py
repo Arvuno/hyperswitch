@@ -803,52 +803,101 @@ BUCKET_3_FEATURES = [
 
 
 def setup_db(db_path):
+    """
+    Create or refresh the schema. The `issues` table is the source of truth
+    for the web app and is read+written by both the scheduler (auto-extracted
+    fields) and the UI (human-edited fields: assignee, coverage_status,
+    status, notes). Auto fields are upserted here without touching human
+    fields; see upsert_issues().
+
+    If an older issues schema is present (no `assignee` column), the table
+    is dropped and recreated — auto fields are regenerated, human fields
+    are then re-backfilled by merge_cypress_coverage.py.
+    """
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode = WAL")
+    conn.execute("PRAGMA foreign_keys = ON")
+
+    existing = {r[1] for r in conn.execute("PRAGMA table_info(issues)").fetchall()}
+    # `notes` is the marker for the redesigned schema (also has NOT NULL
+    # defaults on connector/pm/pmt). If it's missing, the table is old —
+    # drop and rebuild.
+    if existing and "notes" not in existing:
+        conn.execute("DROP TABLE issues")
+        existing = set()
+
+    if not existing:
+        conn.execute("""
+            CREATE TABLE issues (
+                id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+                bucket             INTEGER NOT NULL CHECK (bucket IN (1,2,3)),
+                connector          TEXT    NOT NULL DEFAULT '',
+                pm                 TEXT    NOT NULL DEFAULT '',
+                pmt                TEXT    NOT NULL DEFAULT '',
+                feature            TEXT    NOT NULL,
+                description        TEXT,
+                hs_endpoint        TEXT,
+                source             TEXT,
+                cypress_status     TEXT    NOT NULL DEFAULT 'not_covered',
+                prod_used          TEXT    NOT NULL DEFAULT 'unknown',
+                prod_last_seen_at  TEXT,
+                prod_checked_at    TEXT,
+                assignee           TEXT,
+                coverage_status    TEXT,
+                status             TEXT    NOT NULL DEFAULT 'open'
+                                       CHECK(status IN ('open','picked_up','covered')),
+                notes              TEXT,
+                created_at         TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at         TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(bucket, connector, pm, pmt, feature)
+            )
+        """)
+
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS issues (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
-            bucket         INTEGER NOT NULL,
-            connector      TEXT,
-            pm             TEXT,
-            pmt            TEXT,
-            feature        TEXT NOT NULL,
-            description    TEXT,
-            hs_endpoint    TEXT,
-            source         TEXT,
-            cypress_status TEXT,
-            status         TEXT NOT NULL DEFAULT 'open'
-                           CHECK(status IN ('open', 'picked_up', 'covered')),
-            updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(bucket, connector, pm, pmt, feature)
+        CREATE TABLE IF NOT EXISTS pipeline_runs (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            started_at    TEXT NOT NULL,
+            finished_at   TEXT,
+            status        TEXT NOT NULL,
+            log_path      TEXT,
+            triggered_by  TEXT NOT NULL DEFAULT 'cron'
         )
     """)
+
     conn.commit()
     return conn
 
 
 def upsert_issues(conn, rows):
     """
-    rows: list of dicts with keys:
-      bucket, connector, pm, pmt, feature, description, hs_endpoint, source, cypress_status
+    Upsert auto-extracted rows. Human-edited columns (assignee,
+    coverage_status, notes) are NEVER touched here — they only flow through
+    merge_cypress_coverage.py or the web UI.
 
     Status rules:
-      - cypress_status='covered'     → status='covered' (always, cypress is source of truth)
+      - cypress_status='covered'     → status='covered'
       - cypress_status changes away from covered → reset status to 'open'
       - otherwise preserve existing status ('open' or 'picked_up')
     """
     for row in rows:
-        row['initial_status'] = 'covered' if row['cypress_status'] == 'covered' else 'open'
+        # Empty string instead of NULL so the UNIQUE key dedups properly.
+        row["connector"] = row.get("connector") or ""
+        row["pm"] = row.get("pm") or ""
+        row["pmt"] = row.get("pmt") or ""
+        row["initial_status"] = "covered" if row["cypress_status"] == "covered" else "open"
 
     conn.executemany("""
-        INSERT INTO issues (bucket, connector, pm, pmt, feature, description, hs_endpoint, source, cypress_status, status)
-        VALUES (:bucket, :connector, :pm, :pmt, :feature, :description, :hs_endpoint, :source, :cypress_status, :initial_status)
+        INSERT INTO issues (bucket, connector, pm, pmt, feature, description,
+                            hs_endpoint, source, cypress_status, status)
+        VALUES (:bucket, :connector, :pm, :pmt, :feature, :description,
+                :hs_endpoint, :source, :cypress_status, :initial_status)
         ON CONFLICT(bucket, connector, pm, pmt, feature) DO UPDATE SET
             description    = excluded.description,
             hs_endpoint    = excluded.hs_endpoint,
             source         = excluded.source,
             cypress_status = excluded.cypress_status,
             status = CASE
-                WHEN excluded.cypress_status = 'covered'                           THEN 'covered'
+                WHEN excluded.cypress_status = 'covered'                                THEN 'covered'
                 WHEN issues.status = 'covered' AND excluded.cypress_status != 'covered' THEN 'open'
                 ELSE issues.status
             END,

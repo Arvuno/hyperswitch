@@ -1,0 +1,28 @@
+version: "3.8"
+
+# Two services share the same parent directory (the hyperswitch repo) as
+# /repo, so features.db and the script outputs flow between them.
+
+services:
+  web:
+    build: ./web
+    container_name: coverage-web
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../:/repo
+    environment:
+      DB_PATH: /repo/features.db
+      REPO_ROOT: /repo
+      TZ: Asia/Kolkata
+    restart: unless-stopped
+
+  scheduler:
+    build: ./scheduler
+    container_name: coverage-scheduler
+    volumes:
+      - ../:/repo
+    environment:
+      REPO_ROOT: /repo
+      TZ: Asia/Kolkata
+    restart: unless-stopped
