@@ -631,12 +631,14 @@ def get_cypress_status_bucket1(connector, feature, cypress_configs, include_list
 
     # Check specific include lists
     feature_include_map = {
-        "Incremental Authorization": "INCREMENTAL_AUTH",
-        "Overcapture": "OVERCAPTURE",
-        "Installments": "CARD_INSTALLMENTS",
+        "Incremental Authorization":   "INCREMENTAL_AUTH",
+        "Overcapture":                 "OVERCAPTURE",
+        "Installments":                "CARD_INSTALLMENTS",
         "Partner Merchant Identifier": "PARTNER_MERCHANT_IDENTIFIER",
-        "Billing Descriptor": "BILLING_DESCRIPTOR",
+        "Billing Descriptor":          "BILLING_DESCRIPTOR",
         "External 3DS Authentication": "EXTERNAL_THREE_DS",
+        "Balance Check Flow":          "GIFT_CARD",
+        "Connector Testing Data":      "CONNECTOR_TESTING_DATA",
     }
     if feature in feature_include_map:
         list_name = feature_include_map[feature]

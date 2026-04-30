@@ -5,7 +5,16 @@
 
 set -euo pipefail
 
-REPO_ROOT="${REPO_ROOT:-/repo}"
+# Default REPO_ROOT to /repo (Docker mount), but if that doesn't exist fall
+# back to the directory two levels up from this script (so the same script
+# works when run locally outside Docker).
+if [[ -z "${REPO_ROOT:-}" ]]; then
+  if [[ -d /repo ]]; then
+    REPO_ROOT=/repo
+  else
+    REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+  fi
+fi
 LOG_DIR="$REPO_ROOT/coverage_app/logs"
 mkdir -p "$LOG_DIR"
 

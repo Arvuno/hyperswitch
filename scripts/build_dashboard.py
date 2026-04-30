@@ -240,12 +240,12 @@ HTML_TEMPLATE = Template("""<!DOCTYPE html>
     <div class="delta">$cypress_ratio% ratio to new features — higher is better</div>
   </div>
   <div class="card">
-    <div class="label">Latest Tag Contribution</div>
-    <div class="value">+$latest_new_cypress cypress</div>
+    <div class="label">Latest Release (<strong>$latest_tag</strong>)</div>
+    <div class="value">+$latest_new_cypress new cypress</div>
     <div class="delta">
-      Tag: <strong>$latest_tag</strong><br>
-      Features added: $latest_new_features<br>
-      Coverage: $prev_pct% → $coverage_pct% ($delta_sign$delta_pct pp)
+      $latest_new_features new feature(s) added in this tag.<br>
+      Coverage: $prev_pct% → $coverage_pct% ($delta_sign$delta_pct pp).<br>
+      <span class="text-zinc-500">Last 7 tags:</span> +$week_new_cypress cypress · +$week_new_features features
     </div>
   </div>
 </div>
@@ -436,8 +436,14 @@ def main():
         f"SELECT COUNT(*) FROM cypress_test_introductions {w_cyp}", params
     ).fetchone()[0]
 
-    # Latest-tag delta: what did the most recent tag add to cypress coverage?
+    # Latest-tag delta + last-7-tags rollup. We include the rollup so PRs
+    # whose cypress entries are split across consecutive tags (e.g. one PR
+    # adds 3 entries on day N, another adds 1 entry on day N+1) don't
+    # disappear into a single "+1" headline number.
     latest_tag = latest["tag"]
+    recent_tags = [s["tag"] for s in series[-7:]]
+    placeholders = ",".join("?" * len(recent_tags))
+
     latest_new_cypress = conn.execute(
         "SELECT COUNT(*) FROM cypress_test_introductions WHERE covered_in_tag = ?",
         (latest_tag,),
@@ -446,6 +452,15 @@ def main():
         "SELECT COUNT(*) FROM feature_introductions WHERE introduced_in_tag = ?",
         (latest_tag,),
     ).fetchone()[0]
+    week_new_cypress = conn.execute(
+        f"SELECT COUNT(*) FROM cypress_test_introductions WHERE covered_in_tag IN ({placeholders})",
+        recent_tags,
+    ).fetchone()[0]
+    week_new_features = conn.execute(
+        f"SELECT COUNT(*) FROM feature_introductions WHERE introduced_in_tag IN ({placeholders})",
+        recent_tags,
+    ).fetchone()[0]
+    week_window = f"{recent_tags[0]} → {recent_tags[-1]}" if len(recent_tags) > 1 else recent_tags[0]
     conn.close()
 
     # Coverage % at latest vs previous tag (across all 3 buckets)
@@ -485,6 +500,8 @@ def main():
         latest_tag=latest_tag,
         latest_new_cypress=latest_new_cypress,
         latest_new_features=latest_new_features,
+        week_new_cypress=week_new_cypress,
+        week_new_features=week_new_features,
         prev_pct=prev_pct,
         delta_sign=delta_sign,
         delta_pct=delta_pct,

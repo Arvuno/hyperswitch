@@ -460,5 +460,7 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2026.04.27.0,1,trustpay,,,Billing Descriptor
 2026.04.28.0,1,adyen,,,Partner Merchant Identifier
 2026.04.28.0,1,checkout,,,Partner Merchant Identifier
+2026.04.29.0,1,adyen,,,Balance Check Flow
 2026.04.29.0,2,adyen,GiftCard,Givex,Payment
 2026.04.29.0,2,adyen,GiftCard,PaySafeCard,Payment
+2026.04.30.0,1,adyen,,,Connector Testing Data
