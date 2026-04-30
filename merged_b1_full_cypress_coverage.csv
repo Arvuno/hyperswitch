@@ -2,7 +2,7 @@ connector,feature,description,hs_endpoint,cypress_test_status,prod_used,latest_p
 barclaycard,Authentication Flow,3DS challenge step — presents OTP or biometric prompt to cardholder and processes the authentication result,POST /payments (internal 3DS challenge),not_covered,no,,Preetam,
 cybersource,Authentication Flow,3DS challenge step — presents OTP or biometric prompt to cardholder and processes the authentication result,POST /payments (internal 3DS challenge),not_covered,no,,Preetam,
 redsys,Authentication Flow,3DS challenge step — presents OTP or biometric prompt to cardholder and processes the authentication result,POST /payments (internal 3DS challenge),not_covered,no,,Preetam,
-adyen,Balance Check Flow,Check remaining balance on a gift card before authorizing the payment,POST /payments (internal gift card balance check),not_covered,no,,Sundari,Review
+adyen,Balance Check Flow,Check remaining balance on a gift card before authorizing the payment,POST /payments (internal gift card balance check),covered,no,,Sundari,Review
 blackhawknetwork,Balance Check Flow,Check remaining balance on a gift card before authorizing the payment,POST /payments (internal gift card balance check),no_cypress_config,no,,Sundari,
 adyen,Billing Descriptor,Custom text shown on the cardholder's bank statement (soft descriptor / statement descriptor),POST /payments (billing_descriptor in body),covered,unknown,,Sundari,Covered
 checkout,Billing Descriptor,Custom text shown on the cardholder's bank statement (soft descriptor / statement descriptor),POST /payments (billing_descriptor in body),covered,unknown,,Sundari,Covered
@@ -12,7 +12,7 @@ santander,Billing Descriptor,Custom text shown on the cardholder's bank statemen
 stripe,Billing Descriptor,Custom text shown on the cardholder's bank statement (soft descriptor / statement descriptor),POST /payments (billing_descriptor in body),covered,unknown,,Sundari,Covered
 trustpay,Billing Descriptor,Custom text shown on the cardholder's bank statement (soft descriptor / statement descriptor),POST /payments (billing_descriptor in body),covered,unknown,,Sundari,Covered
 santander,Connector Intent Metadata,Pass opaque connector-specific intent metadata in the request (e.g. PIX Automático max mandate amount),POST /payments (connector_intent_metadata in router_data),no_cypress_config,unknown,,Vasanth,
-adyen,Connector Testing Data,Pass connector-specific testing flags/data in the request for sandbox/test mode behavior,POST /payments (connector_testing_data in router_data),not_covered,unknown,,Likhin,
+adyen,Connector Testing Data,Pass connector-specific testing flags/data in the request for sandbox/test mode behavior,POST /payments (connector_testing_data in router_data),covered,unknown,,Likhin,
 adyen,Dispute Accept,Accept a chargeback dispute without contesting — connector-specific API call to the dispute service,POST /disputes/{id}/accept,not_covered,no,,Likhin,Covered
 checkout,Dispute Accept,Accept a chargeback dispute without contesting — connector-specific API call to the dispute service,POST /disputes/{id}/accept,not_covered,no,,Likhin,Covered
 worldpayvantiv,Dispute Accept,Accept a chargeback dispute without contesting — connector-specific API call to the dispute service,POST /disputes/{id}/accept,not_covered,no,,Likhin,Covered

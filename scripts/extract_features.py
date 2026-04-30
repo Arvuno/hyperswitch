@@ -33,6 +33,7 @@ DEFAULT_IMPL_FILE = os.path.join(REPO_ROOT, "crates/hyperswitch_connectors/src/d
 CONNECTOR_ENUMS_FILE = os.path.join(REPO_ROOT, "crates/common_enums/src/connector_enums.rs")
 CYPRESS_DIR = os.path.join(REPO_ROOT, "cypress-tests/cypress/e2e/configs/Payment")
 CYPRESS_UTILS = os.path.join(CYPRESS_DIR, "Utils.js")
+CYPRESS_SPEC_ROOT = os.path.join(REPO_ROOT, "cypress-tests/cypress/e2e/spec")
 API_RS = os.path.join(REPO_ROOT, "crates/hyperswitch_interfaces/src/api.rs")
 DB_PATH = os.path.join(REPO_ROOT, "features.db")
 
@@ -700,6 +701,146 @@ def get_cypress_status_bucket2(connector, pm, pmt, feature, cypress_configs):
     return "not_covered"
 
 
+# ---------------------------------------------------------------------------
+# Spec-walk based cypress detection (Option 2)
+# ---------------------------------------------------------------------------
+# Walk every .cy.js file under cypress-tests/cypress/e2e/spec/ recursively,
+# pull spec filenames + describe()/it() titles, and match to feature names
+# via FEATURE_SPEC_PATTERNS. This is what makes B3 cypress detection
+# *actually dynamic* (vs. the hardcoded `cypress_status` in BUCKET_3_FEATURES)
+# and it also catches new test categories (like the Routing/ specs added by
+# PR #12033) that live outside the original Payment/ tree the parser used to
+# scan.
+
+# Each value is a list of regex patterns. A spec matches a feature if any of
+# its patterns appears (case-insensitive) in the spec filename, any
+# describe() title, or any it() title in that file. Add a new entry when a
+# new test category (or include list) lands.
+FEATURE_SPEC_PATTERNS = {
+    # ---- Routing-family (B3) ----
+    "Routing Algorithm":          [r"PriorityRouting", r"VolumeBasedRouting", r"RuleBasedRouting"],
+    "Default Fallback Routing":   [r"DefaultRouting", r"FallbackRouting"],
+    "Dynamic Routing":            [r"DynamicRouting"],
+    "Conditional Routing DSL":    [r"ConditionalRouting", r"RoutingDSL"],
+    "FRM Routing Algorithm":      [r"FRMRouting", r"FraudRouting"],
+    "Payout Routing Algorithm":   [r"PayoutRouting"],
+    "3DS Decision Rule Algorithm": [r"3DSDecisionRule", r"ThreeDSDecisionRule"],
+    "3DS Routing Region UAS":     [r"ThreeDSRoutingRegion"],
+    "Routing Result Source":      [r"RoutingResultSource"],
+    "Routing Evaluate":           [r"RoutingEvaluate"],
+
+    # ---- Retry-family (B3) ----
+    "Auto Retries":               [r"AutoRetries", r"AutoRetry"],
+    "Manual Retry":                [r"ManualRetry"],
+    "Clear PAN Retries":          [r"ClearPan", r"ClearPanRetry"],
+
+    # ---- Webhook (B3) ----
+    "Webhook Details":            [r"PaymentWebhook", r"RefundWebhook", r"OutgoingWebhook"],
+
+    # ---- Customer / Mandate / Sync / Sav (B3) ----
+    "Customer Management":        [r"CustomerCreate", r"CustomerList", r"DeletedCustomerPsync", r"CustomerFlow"],
+    "Mandate Management":         [r"SingleuseMandate", r"MultiuseMandate", r"ListAndRevokeMandate", r"ZeroAuthMandate"],
+    "Payment Sync":               [r"SyncPayment", r"PsyncFlow"],
+    "Save Card Flow":             [r"SaveCard", r"SaveCardFlow"],
+    "Off Session Payments":       [r"OffSession", r"ZeroAuthMandate"],
+
+    # ---- Misc B3 ----
+    "Eligibility Check":          [r"PaymentsEligibility", r"Eligibility"],
+    "Connector Agnostic MIT":     [r"ConnectorAgnosticNTID", r"ConnectorAgnosticMIT"],
+    "External Vault":             [r"ExternalVault"],
+    "External 3DS Authentication": [r"ExternalThreeDS", r"External3DS"],
+    "Multiple Capture":           [r"MultipleCapture"],
+    "Void/Cancel Payment":        [r"VoidPayment"],
+    "Payment Link":               [r"PaymentLink"],
+    "Iframe Redirection":         [r"Iframe"],
+    "Health Check":               [r"HealthCheck"],
+    "Card Testing Guard":         [r"CardTestingGuard"],
+    "Payment Method Operations":  [r"PaymentMethodList", r"PaymentMethodCreate"],
+    "SDK Client Token Generation": [r"SessionToken", r"ClientToken"],
+    "Dispute Management":         [r"DisputeTests", r"\bDispute\b"],
+    "FRM (Fraud Risk Management)": [r"FRM", r"FraudCheck"],
+
+    # ---- B1 features that have dedicated spec files ----
+    "Partner Merchant Identifier": [r"PartnerMerchantIdentifier"],
+    "Connector Testing Data":      [r"ConnectorTestingData"],
+    "Billing Descriptor":          [r"BillingDescriptor"],
+    "Incremental Authorization":   [r"IncrementalAuth"],
+    "Overcapture":                 [r"Overcapture"],
+    "Network Transaction ID":      [r"NetworkTransactionId", r"NTID"],
+}
+
+
+def parse_all_cypress_specs(spec_root):
+    """
+    Walk every .cy.js file under spec_root and return a dict keyed by
+    full path with each value being:
+        { 'filename': str, 'describes': [str], 'its': [str], 'haystack': str }
+    `haystack` is the lowercase concatenation we run regex matches against.
+    """
+    out = {}
+    if not os.path.isdir(spec_root):
+        return out
+    for dirpath, _, filenames in os.walk(spec_root):
+        for fname in filenames:
+            if not fname.endswith(".cy.js"):
+                continue
+            fpath = os.path.join(dirpath, fname)
+            try:
+                with open(fpath, encoding="utf-8") as f:
+                    content = f.read()
+            except OSError:
+                continue
+            describes = re.findall(r'describe\s*\(\s*["\'](.+?)["\']', content)
+            its = re.findall(r'\bit\s*\(\s*["\'](.+?)["\']', content)
+            haystack = (fname + " " + " ".join(describes) + " " + " ".join(its)).lower()
+            out[fpath] = {
+                "filename": fname,
+                "describes": describes,
+                "its": its,
+                "haystack": haystack,
+            }
+    return out
+
+
+def feature_covered_by_specs(feature, spec_index):
+    """
+    Return True if any spec's filename / describe / it title matches one of
+    the FEATURE_SPEC_PATTERNS for `feature`. None if the feature has no
+    pattern entry (caller falls back to existing detection).
+    """
+    patterns = FEATURE_SPEC_PATTERNS.get(feature)
+    if not patterns:
+        return None
+    combined = re.compile("|".join(patterns), re.IGNORECASE)
+    for spec in spec_index.values():
+        if combined.search(spec["haystack"]):
+            return True
+    return False
+
+
+def report_orphan_specs(spec_index):
+    """Log any spec file that doesn't match any FEATURE_SPEC_PATTERNS entry."""
+    if not spec_index:
+        return
+    all_patterns = re.compile(
+        "|".join(p for plist in FEATURE_SPEC_PATTERNS.values() for p in plist),
+        re.IGNORECASE,
+    )
+    orphans = []
+    for path, spec in spec_index.items():
+        if not all_patterns.search(spec["haystack"]):
+            orphans.append(spec["filename"])
+    if orphans:
+        print(
+            f"  [orphan-specs] {len(orphans)} spec files match no FEATURE_SPEC_PATTERNS entry:",
+            file=sys.stderr,
+        )
+        for f in sorted(set(orphans))[:20]:
+            print(f"    - {f}", file=sys.stderr)
+        if len(set(orphans)) > 20:
+            print(f"    … and {len(set(orphans)) - 20} more", file=sys.stderr)
+
+
 # ---- Bucket 3: Core features (static list - these don't change with connector code) ----
 BUCKET_3_FEATURES = [
     ("Routing Algorithm", "Payment routing rules and algorithm", "POST /routing + GET /routing/{id}", "business_profile.rs:routing_algorithm", "covered", "Cypress specs: PriorityRouting VolumeBasedRouting RuleBasedRouting"),
@@ -1030,11 +1171,36 @@ def main():
 
     # ---- Bucket 3 ----
     print("  Generating Bucket 3...", file=sys.stderr)
+
+    # Spec-walk: dynamically determine cypress coverage for B3 features by
+    # walking the cypress spec tree (incl. Routing/, etc.) and pattern-matching
+    # spec filenames + describe/it titles against FEATURE_SPEC_PATTERNS.
+    # Falls back to the hardcoded value in BUCKET_3_FEATURES when no pattern
+    # is defined for that feature.
+    spec_index = parse_all_cypress_specs(CYPRESS_SPEC_ROOT)
+    print(f"  Indexed {len(spec_index)} cypress spec files", file=sys.stderr)
+
     b3_out = os.path.join(REPO_ROOT, "bucket_3_core_features.csv")
+    b3_rows_resolved = []  # parallel list with cypress_status overridden
+    overrides = 0
+    for row in BUCKET_3_FEATURES:
+        feature = row[0]
+        hardcoded_status = row[4]
+        detected = feature_covered_by_specs(feature, spec_index)
+        if detected is None:
+            resolved_status = hardcoded_status
+        else:
+            resolved_status = "covered" if detected else "not_covered"
+            if resolved_status != hardcoded_status:
+                overrides += 1
+        b3_rows_resolved.append((row[0], row[1], row[2], row[3], resolved_status, row[5]))
+
+    if overrides:
+        print(f"  Bucket 3: spec-walk overrode hardcoded cypress_status on {overrides} features", file=sys.stderr)
+
     with open(b3_out, "w") as f:
         f.write("feature,description,hs_endpoint,source,cypress_test_status,notes\n")
-        for row in BUCKET_3_FEATURES:
-            # Escape commas in fields
+        for row in b3_rows_resolved:
             escaped = []
             for field in row:
                 if "," in str(field):
@@ -1043,10 +1209,10 @@ def main():
                     escaped.append(str(field))
             f.write(",".join(escaped) + "\n")
 
-    print(f"  Bucket 3: {len(BUCKET_3_FEATURES)} rows written to {b3_out}", file=sys.stderr)
+    print(f"  Bucket 3: {len(b3_rows_resolved)} rows written to {b3_out}", file=sys.stderr)
 
     b3_db_rows = []
-    for row in BUCKET_3_FEATURES:
+    for row in b3_rows_resolved:
         feature, description, hs_endpoint, source, cypress_status = row[0], row[1], row[2], row[3], row[4]
         b3_db_rows.append({
             "bucket": 3, "connector": None, "pm": None, "pmt": None,
@@ -1055,6 +1221,10 @@ def main():
         })
     upsert_issues(db_conn, b3_db_rows)
     print(f"  Bucket 3: {len(b3_db_rows)} rows upserted to DB", file=sys.stderr)
+
+    # Surface any spec files we don't recognize — these are gaps the team can
+    # close by adding entries to FEATURE_SPEC_PATTERNS.
+    report_orphan_specs(spec_index)
 
     db_conn.close()
 

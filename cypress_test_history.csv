@@ -8,7 +8,6 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2025.01.27.0,1,wellsfargo,,,Network Transaction ID
 2025.01.27.0,1,worldpay,,,Network Transaction ID
 2025.01.27.0,2,deutschebank,Card,Credit,Payment
-2025.01.27.0,3,,,,Auto Retries
 2025.01.27.0,3,,,,Blocklist
 2025.01.27.0,3,,,,Browser Info Collection
 2025.01.27.0,3,,,,Business Profile Management
@@ -16,12 +15,9 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2025.01.27.0,3,,,,Customer Acceptance
 2025.01.27.0,3,,,,Customer Management
 2025.01.27.0,3,,,,Dynamic Fields
-2025.01.27.0,3,,,,Eligibility Check
-2025.01.27.0,3,,,,External Vault
 2025.01.27.0,3,,,,Health Check
 2025.01.27.0,3,,,,MCA Management
 2025.01.27.0,3,,,,Mandate Management
-2025.01.27.0,3,,,,Manual Retry
 2025.01.27.0,3,,,,Merchant Account Management
 2025.01.27.0,3,,,,Off Session Payments
 2025.01.27.0,3,,,,Organization Management
@@ -32,10 +28,8 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2025.01.27.0,3,,,,Payout Type
 2025.01.27.0,3,,,,Platform Account
 2025.01.27.0,3,,,,Routing Algorithm
-2025.01.27.0,3,,,,SDK Client Token Generation
 2025.01.27.0,3,,,,Save Card Flow
 2025.01.27.0,3,,,,Void/Cancel Payment
-2025.01.27.0,3,,,,Webhook Details
 2025.02.06.0,2,deutschebank,Card,Debit,Payment
 2025.02.26.0,1,paybox,,,Refund
 2025.02.26.0,2,jpmorgan,Card,Credit,Payment
@@ -372,6 +366,7 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2025.09.19.0,2,trustpayments,Card,Credit,Payment
 2025.09.19.0,2,trustpayments,Card,Debit,Payment
 2025.09.24.1,1,checkout,,,Network Transaction ID
+2025.09.29.0,3,,,,Manual Retry
 2025.09.30.0,2,peachpayments,Card,Credit,Payment
 2025.09.30.0,2,peachpayments,Card,Debit,Payment
 2025.10.01.1,1,tesouro,,,Refund
@@ -387,6 +382,7 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2025.10.23.0,2,finix,Card,Debit,Mandate
 2025.11.06.0,2,tesouro,Card,Credit,Mandate
 2025.11.06.0,2,tesouro,Card,Debit,Mandate
+2025.11.21.0,3,,,,Eligibility Check
 2025.11.24.0,2,airwallex,Card,Credit,Mandate
 2025.11.24.0,2,airwallex,Card,Debit,Mandate
 2025.12.03.0,1,mollie,,,Refund
@@ -421,6 +417,7 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2026.01.13.0,2,mollie,BankRedirect,Sofort,Payment
 2026.01.20.0,2,gigadat,BankRedirect,Interac,Payment
 2026.01.20.0,2,loonio,BankRedirect,Interac,Payment
+2026.01.22.0,3,,,,Webhook Details
 2026.02.19.0,2,calida,Wallet,Bluecode,Payment
 2026.02.26.0,2,checkout,NetworkToken,NetworkToken,Payment
 2026.02.26.0,2,nuvei,NetworkToken,NetworkToken,Payment
@@ -428,8 +425,11 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2026.03.11.0,1,adyen,,,Installments
 2026.03.25.0,1,stripe,,,Split Payments
 2026.03.25.0,1,stripe,,,Split Refunds
+2026.04.02.0,3,,,,External Vault
+2026.04.09.0,3,,,,Auto Retries
 2026.04.21.0,1,adyen,,,Billing Descriptor
 2026.04.22.0,1,checkout,,,Billing Descriptor
+2026.04.22.0,3,,,,External 3DS Authentication
 2026.04.23.0,2,adyen,Wallet,AliPay,Payment
 2026.04.23.0,2,adyen,Wallet,AliPayHk,Payment
 2026.04.23.0,2,adyen,Wallet,ApplePay,Payment
@@ -460,7 +460,9 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2026.04.27.0,1,trustpay,,,Billing Descriptor
 2026.04.28.0,1,adyen,,,Partner Merchant Identifier
 2026.04.28.0,1,checkout,,,Partner Merchant Identifier
+2026.04.28.0,3,,,,Dispute Management
 2026.04.29.0,1,adyen,,,Balance Check Flow
 2026.04.29.0,2,adyen,GiftCard,Givex,Payment
 2026.04.29.0,2,adyen,GiftCard,PaySafeCard,Payment
 2026.04.30.0,1,adyen,,,Connector Testing Data
+2026.04.30.0,3,,,,Default Fallback Routing

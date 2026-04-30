@@ -3,9 +3,9 @@ Routing Algorithm,Payment routing rules and algorithm,POST /routing + GET /routi
 Dynamic Routing,AI/ML-based dynamic routing algorithm,POST /routing (dynamic type),business_profile.rs:dynamic_routing_algorithm,not_covered,,yes,2026-04-03 14:18:30.564611
 FRM Routing Algorithm,Fraud risk management routing rules,POST /accounts/{merchant_id} (frm_routing_algorithm field),business_profile.rs:frm_routing_algorithm,not_covered,,no,
 Payout Routing Algorithm,Payout routing rules,POST /routing (payout type),business_profile.rs:payout_routing_algorithm,not_covered,,yes,2026-04-20 14:31:05.204551
-Default Fallback Routing,Fallback routing when primary routing fails,POST /business_profile (default_fallback_routing),business_profile.rs:default_fallback_routing,not_covered,,yes,2026-04-14 13:37:10.684702
+Default Fallback Routing,Fallback routing when primary routing fails,POST /business_profile (default_fallback_routing),business_profile.rs:default_fallback_routing,covered,,yes,2026-04-14 13:37:10.684702
 3DS Decision Rule Algorithm,Rules engine for 3DS authentication decisions,POST /routing (3ds decision type),business_profile.rs:three_ds_decision_rule_algorithm,not_covered,,yes,2026-04-20 14:31:05.204551
-External 3DS Authentication,External 3DS authentication service integration,POST /payments (request_external_three_ds_authentication),business_profile.rs:authentication_connector_details,not_covered,,yes,2026-04-21 03:04:10.439
+External 3DS Authentication,External 3DS authentication service integration,POST /payments (request_external_three_ds_authentication),business_profile.rs:authentication_connector_details,covered,,yes,2026-04-21 03:04:10.439
 Authentication Service Eligibility,Eligibility for authentication service,POST /payments (read during 3DS auth eligibility check),configs table:authentication_service_eligible,not_covered,,yes,
 Eligibility Check,Perform payment eligibility checks,POST /payments/eligibility,configs table:should_perform_eligibility,covered,Cypress spec 35-PaymentsEligibilityAPI,yes,
 Eligibility Data Storage For Auth,Store eligibility check data for authentication,POST /payments (read during UAS 3DS flow),configs table:should_store_eligibility_check_data_for_authentication,not_covered,,yes,
@@ -56,7 +56,7 @@ Poll Config,Payment status polling configuration,GET /payments/{id} (read during
 Forex/Currency Conversion,Currency conversion for payments,GET /forex/rates,settings.rs:forex_api,not_covered,,unknown,
 Relay Operations,Relay API for direct connector operations,POST /relay (capture/refund/void/incremental_auth),api_models/relay.rs,not_covered,,no,
 Subscription Management,Subscription CRUD and lifecycle management,POST/GET/PUT /subscriptions,api_models/subscription.rs,not_covered,,no,
-Dispute Management,Dispute accept/defend/submit evidence,POST /disputes/{id}/accept + POST /disputes/{id}/evidence,api_models/disputes.rs,not_covered,,no,
+Dispute Management,Dispute accept/defend/submit evidence,POST /disputes/{id}/accept + POST /disputes/{id}/evidence,api_models/disputes.rs,covered,,no,
 FRM (Fraud Risk Management),Fraud check flows,POST /payments (internal FRM check),merchant_connector_account.rs:frm_configs,not_covered,,no,
 Network Tokenization Credentials,Credentials for network tokenization,POST /business_profile (network_tokenization_credentials),business_profile.rs:network_tokenization_credentials,not_covered,,no,
 OIDC Authentication,OpenID Connect authentication for users,POST /oidc/token,api_models/oidc.rs,not_covered,,yes,2026-04-21 00:33:10.324
@@ -84,7 +84,7 @@ Payment Manual Update,Manual payment status update by admin,PUT /payments/{id}/m
 Refund Manual Update,Manual refund status update by admin,PUT /refunds/{id}/manual-update,api_models/refunds.rs,not_covered,,no,
 Credentials Identifier Mapping,MCA credentials identifier mapping,POST /payments (read during MCA credential lookup),configs table:mcd_{merchant_id},not_covered,,yes,
 Routing Evaluate,Evaluate routing rules without creating payment,POST /routing/evaluate,api_models/routing.rs,not_covered,,yes,2026-04-20 14:24:54.604
-SDK Client Token Generation,Generate SDK session/client tokens for frontend,POST /payments/session_tokens,hyperswitch_interfaces/api.rs,covered,Cypress spec 26-SessionCall,yes,2026-04-21 02:17:05.481
+SDK Client Token Generation,Generate SDK session/client tokens for frontend,POST /payments/session_tokens,hyperswitch_interfaces/api.rs,not_covered,Cypress spec 26-SessionCall,yes,2026-04-21 02:17:05.481
 Gateway Status Map (GSM),Map connector error codes to retry actions,POST /payments (read during auto-retry flow),configs table:should_call_gsm,not_covered,,yes,2026-04-20 07:42:47.078
 Vault Tokenization Disable,Disable vault tokenization for modular auth,POST /payments (read during UAS modular auth flow),configs table:should_disable_vault_tokenization,not_covered,,no,
 Delayed Session Response,Delayed session response handling,POST /payments/session_tokens (internal delay),settings.rs:delayed_session_response,not_covered,,unknown,
