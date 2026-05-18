@@ -16,6 +16,7 @@ impl Default for super::settings::Server {
             client_disconnect_timeout: 1000,
             #[cfg(feature = "tls")]
             tls: None,
+            trusted_proxies: Vec::new(),
         }
     }
 }

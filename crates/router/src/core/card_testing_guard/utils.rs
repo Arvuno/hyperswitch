@@ -31,6 +31,10 @@ pub async fn validate_card_testing_guard_checks(
             let mut card_ip_blocking_cache_key = String::new();
             let mut guest_user_card_blocking_cache_key = String::new();
             let mut customer_id_blocking_cache_key = String::new();
+            let ip_only_blocking_cache_key = None::<String>;
+
+            let is_ip_only_blocking_enabled =
+                card_testing_guard_config.is_ip_only_blocking_enabled;
 
             if card_testing_guard_config.is_card_ip_blocking_enabled {
                 if let Some(browser_info) = browser_info {
@@ -103,6 +107,8 @@ pub async fn validate_card_testing_guard_checks(
                     .is_customer_id_blocking_enabled,
                 customer_id_blocking_cache_key,
                 card_testing_guard_expiry,
+                is_ip_only_blocking_enabled,
+                ip_only_blocking_cache_key,
             }))
         }
         None => Ok(None),

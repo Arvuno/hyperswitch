@@ -839,6 +839,7 @@ pub struct Server {
     pub client_disconnect_timeout: u64,
     #[cfg(feature = "tls")]
     pub tls: Option<ServerTls>,
+    pub trusted_proxies: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
