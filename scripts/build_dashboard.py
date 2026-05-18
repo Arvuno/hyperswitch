@@ -34,12 +34,129 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(REPO_ROOT, "features.db")
 OUT_HTML = os.path.join(REPO_ROOT, "dashboard.html")
 
+# ---- Exclusions ----
+EXCLUDED_CONNECTORS = {
+    "blackhawknetwork", "boku", "breadpay", "celero", "chargebee", "digitalvirgo",
+    "flexiti", "getnet", "gpayments", "hyperwallet", "imerchantsolutions",
+    "juspaythreedsserver", "katapult", "mpgs", "payeezy", "paytm", "phonepe",
+    "powertranz", "prophetpay", "santander", "sift", "silverflow", "square",
+    "tokenex", "trustpayments", "zift", "zen"
+}
 
-def fetch_series(cutoff_tag=None):
-    """Return list of {tag, b1, b2, b3, b1_covered, b2_covered, b3_covered} dicts, oldest first.
-    Filters out tags where extraction didn't work (total features == 0)."""
+# Payment method types to exclude from Bucket 2
+EXCLUDED_PM_TYPES_BUCKET2 = {"GooglePay", "ApplePay"}
+
+# Specific connector + flow combinations to exclude
+EXCLUDED_FLOW_COMBINATIONS = {
+    ("airwallex", "Order Create Flow"),
+    ("nordea", "Order Create Flow"),
+    ("payme", "Order Create Flow"),
+    ("razorpay", "Order Create Flow"),
+    ("trustpay", "Order Create Flow"),
+    ("amazonpay", "Refund"),
+    ("bitpay", "Refund"),
+    ("coingate", "Refund"),
+    ("gigadat", "Refund"),
+    ("itaubank", "Refund"),
+    ("klarna", "Refund"),
+    ("loonio", "Refund"),
+    ("razorpay", "Refund"),
+    ("santander", "Refund"),
+    ("stripe", "Overcapture"),
+    ("revolv3", "Refund"),
+    ("truelayer", "Refund"),
+    ("trustly", "Refund"),
+    ("adyen", "Split Refunds"),
+}
+
+# Features to exclude from Bucket 3
+EXCLUDED_FEATURES_BUCKET3 = {
+    "Split Transactions Enabled",
+    "Process Tracker Mapping",
+}
+
+
+def fetch_prod_coverage(until_tag=None):
+    """
+    Return prod-usage coverage breakdown (after exclusions) as a dict.
+    When until_tag is given, coverage is determined from tag_snapshots at
+    that specific tag (point-in-time snapshot) rather than issues.status
+    (current state).
+    """
     conn = sqlite3.connect(DB_PATH)
-    sql = """
+
+    # Coverage source: tag_snapshots at until_tag, or current issues.status
+    if until_tag:
+        snap = {
+            (b, c, pm, pmt, f): cov
+            for b, c, pm, pmt, f, cov in conn.execute(
+                "SELECT bucket,connector,pm,pmt,feature,is_covered FROM tag_snapshots WHERE tag=?",
+                (until_tag,)
+            ).fetchall()
+        }
+
+    rows = conn.execute("""
+        SELECT bucket, connector, pm, pmt, feature, prod_used, status
+        FROM issues
+    """).fetchall()
+    conn.close()
+
+    from collections import defaultdict
+    buckets_by_prod = defaultdict(lambda: defaultdict(lambda: [0, 0]))
+
+    for bucket, connector, pm, pmt, feature, prod_used, status in rows:
+        if connector and connector.lower() in EXCLUDED_CONNECTORS:
+            continue
+        if bucket == 2 and pmt in EXCLUDED_PM_TYPES_BUCKET2:
+            continue
+        if bucket == 1 and (connector, feature) in EXCLUDED_FLOW_COMBINATIONS:
+            continue
+        if bucket == 3 and feature in EXCLUDED_FEATURES_BUCKET3:
+            continue
+
+        prod = (prod_used or 'unknown').lower()
+        if prod not in ('yes', 'no', 'unknown'):
+            prod = 'unknown'
+
+        if until_tag:
+            key = (bucket, connector or '', pm or '', pmt or '', feature)
+            covered = snap.get(key, 0)
+        else:
+            covered = 1 if status == 'covered' else 0
+
+        buckets_by_prod[prod][f"b{bucket}"][0] += covered
+        buckets_by_prod[prod][f"b{bucket}"][1] += 1
+        buckets_by_prod[prod]['all'][0] += covered
+        buckets_by_prod[prod]['all'][1] += 1
+
+    result = {}
+    for prod in ('yes', 'no', 'unknown'):
+        result[prod] = {}
+        for k in ('b1', 'b2', 'b3', 'all'):
+            c, t = buckets_by_prod[prod][k]
+            pct = round(100.0 * c / t, 1) if t else 0.0
+            result[prod][k] = {'covered': c, 'total': t, 'not_covered': t - c, 'pct': pct}
+    return result
+
+
+def fetch_series(cutoff_tag=None, until_tag=None):
+    """Return list of {tag, b1, b2, b3, b1_covered, b2_covered, b3_covered} dicts, oldest first.
+    Filters out tags where extraction didn't work (total features == 0).
+    Applies exclusions for specific connectors, flows, and features."""
+    conn = sqlite3.connect(DB_PATH)
+    
+    # Build exclusion conditions for connectors
+    connector_excludes = " OR ".join([f"LOWER(connector) = '{c}'" for c in EXCLUDED_CONNECTORS])
+    pm_type_excludes = " OR ".join([f"pmt = '{pmt}'" for pmt in EXCLUDED_PM_TYPES_BUCKET2])
+    b3_feature_excludes = " OR ".join([f"feature = '{f}'" for f in EXCLUDED_FEATURES_BUCKET3])
+    
+    # Exclude specific (connector, feature) flow combinations from B1
+    flow_combo_excludes = " OR ".join(
+        [f"(LOWER(connector) = '{c}' AND feature = '{f}')"
+         for c, f in EXCLUDED_FLOW_COMBINATIONS]
+    )
+
+    sql = f"""
         SELECT
             tag,
             SUM(CASE WHEN bucket = 1 THEN 1 ELSE 0 END) AS b1,
@@ -49,13 +166,20 @@ def fetch_series(cutoff_tag=None):
             SUM(CASE WHEN bucket = 2 AND is_covered = 1 THEN 1 ELSE 0 END) AS b2_covered,
             SUM(CASE WHEN bucket = 3 AND is_covered = 1 THEN 1 ELSE 0 END) AS b3_covered
         FROM tag_snapshots
-        {where}
+        WHERE (bucket != 1 OR NOT ({connector_excludes}))
+          AND (bucket != 1 OR NOT ({flow_combo_excludes}))
+          AND (bucket != 2 OR (NOT ({connector_excludes}) AND NOT ({pm_type_excludes})))
+          AND (bucket != 3 OR NOT ({b3_feature_excludes}))
+          {{cutoff_where}}
         GROUP BY tag
         ORDER BY tag
     """
-    where = "WHERE tag >= ?" if cutoff_tag else ""
-    params = (cutoff_tag,) if cutoff_tag else ()
-    rows = conn.execute(sql.format(where=where), params).fetchall()
+    cutoff_where = ""
+    if cutoff_tag:
+        cutoff_where += f"AND tag >= '{cutoff_tag}' "
+    if until_tag:
+        cutoff_where += f"AND tag <= '{until_tag}' "
+    rows = conn.execute(sql.format(cutoff_where=cutoff_where)).fetchall()
     conn.close()
 
     series = []
@@ -75,11 +199,18 @@ def fetch_series(cutoff_tag=None):
     return series
 
 
-def fetch_monthly_new(cutoff_tag=None):
+def fetch_monthly_new(cutoff_tag=None, until_tag=None):
     """Aggregate new features and new cypress tests per month."""
     conn = sqlite3.connect(DB_PATH)
-    w_feat = "WHERE introduced_in_tag >= ?" if cutoff_tag else ""
-    w_cyp = "WHERE covered_in_tag >= ?" if cutoff_tag else ""
+    conditions_feat, conditions_cyp, params_feat, params_cyp = [], [], [], []
+    if cutoff_tag:
+        conditions_feat.append("introduced_in_tag >= ?"); params_feat.append(cutoff_tag)
+        conditions_cyp.append("covered_in_tag >= ?");    params_cyp.append(cutoff_tag)
+    if until_tag:
+        conditions_feat.append("introduced_in_tag <= ?"); params_feat.append(until_tag)
+        conditions_cyp.append("covered_in_tag <= ?");    params_cyp.append(until_tag)
+    w_feat = ("WHERE " + " AND ".join(conditions_feat)) if conditions_feat else ""
+    w_cyp  = ("WHERE " + " AND ".join(conditions_cyp))  if conditions_cyp  else ""
     params = (cutoff_tag,) if cutoff_tag else ()
     features = conn.execute(f"""
         SELECT substr(introduced_in_tag, 1, 7) AS month,
@@ -89,13 +220,13 @@ def fetch_monthly_new(cutoff_tag=None):
         FROM feature_introductions
         {w_feat}
         GROUP BY month ORDER BY month
-    """, params).fetchall()
+    """, params_feat).fetchall()
     cypress = dict((r[0], r[1]) for r in conn.execute(f"""
         SELECT substr(covered_in_tag, 1, 7) AS month, COUNT(*)
         FROM cypress_test_introductions
         {w_cyp}
         GROUP BY month
-    """, params).fetchall())
+    """, params_cyp).fetchall())
     conn.close()
 
     months = []
@@ -110,17 +241,23 @@ def fetch_monthly_new(cutoff_tag=None):
     return months
 
 
-def fetch_weekly_new(cutoff_tag=None):
+def fetch_weekly_new(cutoff_tag=None, until_tag=None):
     """Aggregate new features and new cypress tests per ISO week."""
     conn = sqlite3.connect(DB_PATH)
-    w_feat = "WHERE introduced_in_tag >= ?" if cutoff_tag else ""
-    w_cyp = "WHERE covered_in_tag >= ?" if cutoff_tag else ""
-    params = (cutoff_tag,) if cutoff_tag else ()
+    conditions_feat, conditions_cyp, params_feat, params_cyp = [], [], [], []
+    if cutoff_tag:
+        conditions_feat.append("introduced_in_tag >= ?"); params_feat.append(cutoff_tag)
+        conditions_cyp.append("covered_in_tag >= ?");    params_cyp.append(cutoff_tag)
+    if until_tag:
+        conditions_feat.append("introduced_in_tag <= ?"); params_feat.append(until_tag)
+        conditions_cyp.append("covered_in_tag <= ?");    params_cyp.append(until_tag)
+    w_feat = ("WHERE " + " AND ".join(conditions_feat)) if conditions_feat else ""
+    w_cyp  = ("WHERE " + " AND ".join(conditions_cyp))  if conditions_cyp  else ""
     feat_rows = conn.execute(
-        f"SELECT introduced_in_tag, bucket FROM feature_introductions {w_feat}", params
+        f"SELECT introduced_in_tag, bucket FROM feature_introductions {w_feat}", params_feat
     ).fetchall()
     cyp_rows = conn.execute(
-        f"SELECT covered_in_tag FROM cypress_test_introductions {w_cyp}", params
+        f"SELECT covered_in_tag FROM cypress_test_introductions {w_cyp}", params_cyp
     ).fetchall()
     conn.close()
 
@@ -188,6 +325,31 @@ HTML_TEMPLATE = Template("""<!DOCTYPE html>
   .chart-box .hint { font-size: 12px; color: #888; margin-bottom: 12px; line-height: 1.5; }
   canvas { max-height: 360px; }
   footer { color: #666; font-size: 11px; margin-top: 32px; text-align: center; }
+  .prod-table-wrap { overflow-x: auto; }
+  .prod-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .prod-table th {
+    background: #12151b; color: #888; font-weight: 500;
+    padding: 8px 12px; text-align: center; border-bottom: 1px solid #2a2e38;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .prod-table th.left { text-align: left; }
+  .prod-table td {
+    padding: 7px 12px; border-bottom: 1px solid #1e2229; text-align: center;
+  }
+  .prod-table td.left { text-align: left; color: #ccc; }
+  .prod-table tr:last-child td { border-bottom: none; }
+  .prod-table .section-header td {
+    background: #12151b; color: #aaa; font-weight: 600;
+    padding: 6px 12px; font-size: 12px;
+  }
+  .prod-table .pct-cell { font-weight: 600; }
+  .prod-table .pct-high  { color: #6bda8f; }
+  .prod-table .pct-mid   { color: #ffa56c; }
+  .prod-table .pct-low   { color: #ff7070; }
+  .prod-table .covered   { color: #6bda8f; }
+  .prod-table .notcov    { color: #ff7070; }
 </style>
 </head>
 <body>
@@ -283,6 +445,34 @@ HTML_TEMPLATE = Template("""<!DOCTYPE html>
   <h2>Cypress Coverage Ratio Over Time</h2>
   <div class="hint">% of all features that have cypress tests. Moving up = tests catching up to features. Moving down = features outpacing tests.</div>
   <canvas id="ratio_chart"></canvas>
+</div>
+
+<div class="chart-box">
+  <h2>Prod Usage vs Cypress Coverage</h2>
+  <div class="hint">
+    Coverage of features grouped by prod usage status, after applying the exclusion list.
+    <strong>prod = yes</strong> — feature observed in production traffic.
+    <strong>prod = no</strong> — not yet seen in production.
+    <strong>prod = unknown</strong> — prod data not collected.
+    Covered = cypress test exists or manually marked covered.
+  </div>
+  <div class="prod-table-wrap">
+  <table class="prod-table">
+    <thead>
+      <tr>
+        <th class="left">Prod Used</th>
+        <th class="left"></th>
+        <th>B1 — Connector Flows</th>
+        <th>B2 — Connector × PM</th>
+        <th>B3 — Core / Schema</th>
+        <th>All Buckets (B1+B2+B3)</th>
+      </tr>
+    </thead>
+    <tbody>
+      $prod_table_rows
+    </tbody>
+  </table>
+  </div>
 </div>
 
 <footer>Generated by scripts/build_dashboard.py · data lives in features.db</footer>
@@ -394,6 +584,14 @@ def main():
         "--months", type=int, default=None,
         help="Limit view to the last N months (default: all data)",
     )
+    parser.add_argument(
+        "--until-tag", default=None, metavar="TAG",
+        help="Generate snapshot dashboard up to (and including) this tag, e.g. 2026.05.05.0",
+    )
+    parser.add_argument(
+        "--out", default=None, metavar="FILE",
+        help="Output HTML filename (default: dashboard.html, or dashboard_<tag>.html with --until-tag)",
+    )
     args = parser.parse_args()
 
     if not os.path.exists(DB_PATH):
@@ -405,9 +603,19 @@ def main():
         cutoff_date = date.today() - timedelta(days=args.months * 30)
         cutoff_tag = cutoff_date.strftime("%Y.%m.%d.0")
 
-    series = fetch_series(cutoff_tag)
-    monthly = fetch_monthly_new(cutoff_tag)
-    weekly = fetch_weekly_new(cutoff_tag)
+    until_tag = args.until_tag or None
+
+    # Determine output file
+    global OUT_HTML
+    if args.out:
+        OUT_HTML = os.path.join(REPO_ROOT, args.out)
+    elif until_tag:
+        OUT_HTML = os.path.join(REPO_ROOT, f"dashboard_{until_tag}.html")
+
+    series  = fetch_series(cutoff_tag, until_tag)
+    monthly = fetch_monthly_new(cutoff_tag, until_tag)
+    weekly  = fetch_weekly_new(cutoff_tag, until_tag)
+    prod_cov = fetch_prod_coverage(until_tag=until_tag)
 
     if not series:
         print("ERROR: No data in tag_snapshots for the selected window.", file=sys.stderr)
@@ -421,9 +629,17 @@ def main():
 
     # "Introduced in period" totals — filtered to the cutoff window
     conn = sqlite3.connect(DB_PATH)
-    w_feat = "WHERE introduced_in_tag >= ?" if cutoff_tag else ""
-    w_cyp = "WHERE covered_in_tag >= ?" if cutoff_tag else ""
-    params = (cutoff_tag,) if cutoff_tag else ()
+    cond_f, cond_c, pf, pc = [], [], [], []
+    if cutoff_tag:
+        cond_f.append("introduced_in_tag >= ?"); pf.append(cutoff_tag)
+        cond_c.append("covered_in_tag >= ?");    pc.append(cutoff_tag)
+    if until_tag:
+        cond_f.append("introduced_in_tag <= ?"); pf.append(until_tag)
+        cond_c.append("covered_in_tag <= ?");    pc.append(until_tag)
+    w_feat  = ("WHERE " + " AND ".join(cond_f)) if cond_f else ""
+    w_cyp   = ("WHERE " + " AND ".join(cond_c)) if cond_c else ""
+    params  = tuple(pf)
+    params_c = tuple(pc)
     new_totals = conn.execute(f"""
         SELECT
             SUM(CASE WHEN bucket = 1 THEN 1 ELSE 0 END),
@@ -433,7 +649,7 @@ def main():
         {w_feat}
     """, params).fetchone()
     total_new_cypress = conn.execute(
-        f"SELECT COUNT(*) FROM cypress_test_introductions {w_cyp}", params
+        f"SELECT COUNT(*) FROM cypress_test_introductions {w_cyp}", params_c
     ).fetchone()[0]
 
     # Latest-tag delta + last-7-tags rollup. We include the rollup so PRs
@@ -452,6 +668,10 @@ def main():
         "SELECT COUNT(*) FROM feature_introductions WHERE introduced_in_tag = ?",
         (latest_tag,),
     ).fetchone()[0]
+    # Restrict recent-tags window to within the until_tag boundary
+    if until_tag:
+        recent_tags = [t for t in recent_tags if t <= until_tag]
+    placeholders = ",".join("?" * len(recent_tags))
     week_new_cypress = conn.execute(
         f"SELECT COUNT(*) FROM cypress_test_introductions WHERE covered_in_tag IN ({placeholders})",
         recent_tags,
@@ -481,6 +701,49 @@ def main():
     new_b1_b2 = total_new_b1 + total_new_b2
     cypress_ratio = round(100.0 * total_new_cypress / new_b1_b2, 1) if new_b1_b2 else 0.0
 
+    # Build prod usage table rows
+    def pct_class(p):
+        if p >= 80: return "pct-high"
+        if p >= 50: return "pct-mid"
+        return "pct-low"
+
+    prod_labels = {
+        'yes':     'prod = yes — observed in production',
+        'no':      'prod = no — not yet seen in production',
+        'unknown': 'prod = unknown — data not available',
+    }
+    prod_rows_html = []
+    for prod in ('yes', 'no', 'unknown'):
+        label = prod_labels[prod]
+        d = prod_cov[prod]
+        # Section header
+        prod_rows_html.append(
+            f'<tr class="section-header"><td colspan="6">{label}</td></tr>'
+        )
+        # Covered row
+        cells = "".join(
+            f'<td class="covered">{d[k]["covered"]}</td>'
+            for k in ('b1','b2','b3','all')
+        )
+        prod_rows_html.append(f'<tr><td></td><td class="left">Covered</td>{cells}</tr>')
+        # Not covered row
+        cells = "".join(
+            f'<td class="notcov">{d[k]["not_covered"]}</td>'
+            for k in ('b1','b2','b3','all')
+        )
+        prod_rows_html.append(f'<tr><td></td><td class="left">Not Covered</td>{cells}</tr>')
+        # Total row
+        cells = "".join(f'<td>{d[k]["total"]}</td>' for k in ('b1','b2','b3','all'))
+        prod_rows_html.append(f'<tr><td></td><td class="left">Total</td>{cells}</tr>')
+        # % row
+        cells = "".join(
+            f'<td class="pct-cell {pct_class(d[k]["pct"])}">{d[k]["pct"]}%</td>'
+            for k in ('b1','b2','b3','all')
+        )
+        prod_rows_html.append(f'<tr><td></td><td class="left">Coverage %</td>{cells}</tr>')
+
+    prod_table_rows = "\n      ".join(prod_rows_html)
+
     html = HTML_TEMPLATE.substitute(
         first_tag=earliest["tag"],
         last_tag=latest["tag"],
@@ -508,6 +771,7 @@ def main():
         series_json=json.dumps(series),
         monthly_json=json.dumps(monthly),
         weekly_json=json.dumps(weekly),
+        prod_table_rows=prod_table_rows,
     )
 
     with open(OUT_HTML, "w", encoding="utf-8") as f:

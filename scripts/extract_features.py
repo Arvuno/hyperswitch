@@ -37,6 +37,48 @@ CYPRESS_SPEC_ROOT = os.path.join(REPO_ROOT, "cypress-tests/cypress/e2e/spec")
 API_RS = os.path.join(REPO_ROOT, "crates/hyperswitch_interfaces/src/api.rs")
 DB_PATH = os.path.join(REPO_ROOT, "features.db")
 
+# ---- Exclusions ----
+# Connectors to completely exclude from feature extraction
+EXCLUDED_CONNECTORS = {
+    "blackhawknetwork", "boku", "breadpay", "celero", "chargebee", "digitalvirgo",
+    "flexiti", "getnet", "gpayments", "hyperwallet", "imerchantsolutions",
+    "juspaythreedsserver", "katapult", "mpgs", "payeezy", "paytm", "phonepe",
+    "powertranz", "prophetpay", "santander", "sift", "silverflow", "square",
+    "tokenex", "trustpayments", "zift", "zen"
+}
+
+# Payment method types to exclude from Bucket 2
+EXCLUDED_PM_TYPES_BUCKET2 = {"GooglePay", "ApplePay"}
+
+# Specific connector + flow combinations to exclude
+EXCLUDED_FLOW_COMBINATIONS = {
+    ("airwallex", "Order Create Flow"),
+    ("nordea", "Order Create Flow"),
+    ("payme", "Order Create Flow"),
+    ("razorpay", "Order Create Flow"),
+    ("trustpay", "Order Create Flow"),
+    ("amazonpay", "Refund"),
+    ("bitpay", "Refund"),
+    ("coingate", "Refund"),
+    ("gigadat", "Refund"),
+    ("itaubank", "Refund"),
+    ("klarna", "Refund"),
+    ("loonio", "Refund"),
+    ("razorpay", "Refund"),
+    ("santander", "Refund"),
+    ("stripe", "Overcapture"),
+    ("revolv3", "Refund"),
+    ("truelayer", "Refund"),
+    ("trustly", "Refund"),
+    ("adyen", "Split Refunds"),  # NEW
+}
+
+# Features to exclude from Bucket 3
+EXCLUDED_FEATURES_BUCKET3 = {
+    "Split Transactions Enabled",
+    "Process Tracker Mapping",  # Retry schedule for sync operations
+}
+
 
 def get_all_connectors():
     """Get all connector module names from the connectors directory."""
@@ -539,12 +581,10 @@ def parse_cypress_configs():
     if not os.path.exists(CYPRESS_DIR):
         return configs
 
-    pm_categories = [
-        "card_pm", "bank_transfer_pm", "bank_redirect_pm", "wallet_pm",
-        "upi_pm", "crypto_pm", "reward_pm", "pay_later_pm", "bank_debit_pm",
-        "voucher_pm", "real_time_pm", "gift_card_pm", "open_banking_pm",
-        "mobile_payment_pm", "card_redirect_pm",
-    ]
+    # Derive the set of PM category strings from the canonical PM_CATEGORY_MAP so
+    # there is a single source of truth. Adding a new PM type to PM_CATEGORY_MAP
+    # automatically covers B2 detection — no second list to keep in sync.
+    pm_categories = set(PM_CATEGORY_MAP.values())
 
     for fname in os.listdir(CYPRESS_DIR):
         if not fname.endswith(".js") or fname in skip:
@@ -555,11 +595,10 @@ def parse_cypress_configs():
         with open(fpath) as f:
             content = f.read()
 
-        pm_types = set()
-        for cat in pm_categories:
-            if cat in content:
-                pm_types.add(cat)
+        # Which PM categories does this connector config cover?
+        pm_types = {cat for cat in pm_categories if cat in content}
 
+        # Global feature keywords (file-wide, used for B1 checks and backwards compat)
         features = set()
         if "Refund" in content:
             features.add("Refund")
@@ -574,10 +613,36 @@ def parse_cypress_configs():
         if "split_refunds" in content or "SplitRefund" in content:
             features.add("Split Refunds")
 
+        # Per-PM-section mandate and refund coverage.
+        # We scan a window of text starting at each PM section header so that a
+        # Mandate test defined only in card_pm does NOT accidentally mark
+        # wallet_pm or bank_debit_pm as having mandate coverage.
+        # Window size (20 000 chars) is large enough to cover even the biggest
+        # PM blocks in the current configs.
+        _WINDOW = 20_000
+        pm_mandate: set = set()
+        pm_refund: set = set()
+        for cat in pm_types:
+            idx = content.find(f"{cat}:")
+            if idx == -1:
+                idx = content.find(f"{cat} :")
+            if idx == -1:
+                continue
+            chunk = content[idx: idx + _WINDOW]
+            if re.search(r'Mandate\w*\s*:', chunk):
+                pm_mandate.add(cat)
+            if re.search(r'Refund\s*:', chunk):
+                pm_refund.add(cat)
+
         # Merge into existing config if alias was used (e.g. StripeConnect into stripe)
-        existing = configs.get(connector, {"pm_types": set(), "features": set()})
-        existing["pm_types"] |= pm_types
-        existing["features"] |= features
+        existing = configs.get(connector, {
+            "pm_types": set(), "features": set(),
+            "pm_mandate": set(), "pm_refund": set(),
+        })
+        existing["pm_types"]   |= pm_types
+        existing["features"]   |= features
+        existing["pm_mandate"] |= pm_mandate
+        existing["pm_refund"]  |= pm_refund
         configs[connector] = existing
 
     # Parse INCLUDE and EXCLUDE lists from Utils.js
@@ -623,6 +688,59 @@ PM_CATEGORY_MAP = {
     "NetworkToken": "card_pm",
 }
 
+# ---------------------------------------------------------------------------
+# Utils.js INCLUDE list → B1 feature name mapping
+#
+# This is the SINGLE source of truth for "which Utils.js INCLUDE list controls
+# Cypress coverage for which B1 feature". When a new Cypress PR adds a new
+# INCLUDE list to Utils.js, add ONE entry here — that is the only edit required.
+#
+# Conventions:
+#   - B1 connector-specific feature  → set value to the exact feature name string
+#   - Multiple lists for the same feature (e.g. BillingDescriptor variants) → both
+#     map to the same feature name; the connector is "covered" if it appears in ANY
+#   - B3 / B2 / structural lists → None with an inline comment explaining why
+#   - MANDATES_USING_NTID_PROXY    → None; handled by custom logic below
+# ---------------------------------------------------------------------------
+UTILS_INCLUDE_FEATURE_MAP = {
+    # ---- B1: per-connector feature coverage ----
+    "INCREMENTAL_AUTH":                  "Incremental Authorization",
+    "OVERCAPTURE":                       "Overcapture",
+    "CARD_INSTALLMENTS":                 "Installments",
+    "BILLING_DESCRIPTOR":                "Billing Descriptor",
+    "BILLING_DESCRIPTOR_INVALID_PHONE":  "Billing Descriptor",       # variant — same feature
+    "EXTERNAL_THREE_DS":                 "External 3DS Authentication",
+    "PARTNER_MERCHANT_IDENTIFIER":       "Partner Merchant Identifier",
+    "EXTEND_AUTHORIZATION":              "Extended Authorization",
+    "GIFT_CARD":                         "Balance Check Flow",
+    "CONNECTOR_TESTING_DATA":            "Connector Testing Data",
+    "PARTIAL_AUTH":                      "Partial Authorization",
+    "L2L3DATA":                          "L2/L3 Data Processing",
+
+    # ---- Handled by custom Network Transaction ID logic, not this map ----
+    "MANDATES_USING_NTID_PROXY":         None,
+
+    # ---- B3: connector-agnostic tests (these lists control test participation,
+    #          not per-connector feature flags — B3 status is set globally) ----
+    "MANUAL_RETRY":                      None,   # B3: Manual Retry
+    "AUTO_RETRY":                        None,   # B3: Auto Retries
+    "PAYMENTS_WEBHOOK":                  None,   # B3: Webhook Details
+    "REFUNDS_WEBHOOK":                   None,   # B3: Webhook Details
+    "AUTH_SERVICE_ELIGIBILITY":          None,   # B3: Authentication Service Eligibility
+    "USE_BILLING_AS_PAYMENT_METHOD_BILLING": None,  # B3: Use Billing As PM Billing
+    "MIT_WITH_LIMITED_CARD_DATA":        None,   # B3: MIT With Limited Card Data
+    "REFUND_MANUAL_UPDATE":              None,   # B3: Refund Manual Update
+    "FEATURE_METADATA":                  None,   # B3: Feature Metadata
+
+    # ---- B2: PM-level coverage — not a per-connector B1 flag ----
+    "BANK_DEBIT":                        None,   # B2: BankDebit PM coverage
+    "PAY_LATER":                         None,   # B2: PayLater PM coverage
+
+    # ---- Structural: test infrastructure, no corresponding feature row ----
+    "DDC_RACE_CONDITION":                None,   # worldpay DDC timing test
+    "UCS_CONNECTORS":                    None,   # Unified Connector Service participants
+}
+
 
 def get_cypress_status_bucket1(connector, feature, cypress_configs, include_lists):
     """Determine cypress coverage for a Bucket 1 (connector, feature) pair."""
@@ -630,21 +748,19 @@ def get_cypress_status_bucket1(connector, feature, cypress_configs, include_list
     if c not in cypress_configs:
         return "no_cypress_config"
 
-    # Check specific include lists
-    feature_include_map = {
-        "Incremental Authorization":   "INCREMENTAL_AUTH",
-        "Overcapture":                 "OVERCAPTURE",
-        "Installments":                "CARD_INSTALLMENTS",
-        "Partner Merchant Identifier": "PARTNER_MERCHANT_IDENTIFIER",
-        "Billing Descriptor":          "BILLING_DESCRIPTOR",
-        "External 3DS Authentication": "EXTERNAL_THREE_DS",
-        "Balance Check Flow":          "GIFT_CARD",
-        "Connector Testing Data":      "CONNECTOR_TESTING_DATA",
-    }
-    if feature in feature_include_map:
-        list_name = feature_include_map[feature]
-        if list_name in include_lists and c in include_lists[list_name]:
-            return "covered"
+    # Build feature → set-of-include-list-names from the module-level map.
+    # Multiple INCLUDE lists can map to the same feature (e.g. BILLING_DESCRIPTOR
+    # and BILLING_DESCRIPTOR_INVALID_PHONE both cover "Billing Descriptor"); a
+    # connector is "covered" if it appears in ANY of them.
+    feature_to_lists = defaultdict(set)
+    for list_name, feat in UTILS_INCLUDE_FEATURE_MAP.items():
+        if feat is not None:
+            feature_to_lists[feat].add(list_name)
+
+    if feature in feature_to_lists:
+        for list_name in feature_to_lists[feature]:
+            if list_name in include_lists and c in include_lists[list_name]:
+                return "covered"
         return "not_covered"
 
     # Refund - check if connector cypress config has Refund tests
@@ -687,16 +803,16 @@ def get_cypress_status_bucket2(connector, pm, pmt, feature, cypress_configs):
     if pm_cat not in cfg["pm_types"]:
         return "not_covered"
 
-    if pm in ("Card", "NetworkToken"):
-        if feature == "Payment":
-            return "covered"
-        if feature == "Refund":
-            return "covered" if "Refund" in cfg["features"] else "not_covered"
-        if feature == "Mandate":
-            return "covered" if "Mandate" in cfg["features"] else "not_covered"
-
     if feature == "Payment":
         return "covered"
+
+    # Mandate and Refund are checked per-PM-section (not file-wide) so that a
+    # Card mandate test does not falsely mark Wallet or BankDebit as covered.
+    if feature == "Mandate":
+        return "covered" if pm_cat in cfg.get("pm_mandate", set()) else "not_covered"
+
+    if feature == "Refund":
+        return "covered" if pm_cat in cfg.get("pm_refund", set()) else "not_covered"
 
     return "not_covered"
 
@@ -731,11 +847,15 @@ FEATURE_SPEC_PATTERNS = {
 
     # ---- Retry-family (B3) ----
     "Auto Retries":               [r"AutoRetries", r"AutoRetry"],
+    "Gateway Status Map (GSM)":   [r"AutoRetries", r"AutoRetry"],   # GSM is read by every auto-retry flow
     "Manual Retry":                [r"ManualRetry"],
     "Clear PAN Retries":          [r"ClearPan", r"ClearPanRetry"],
 
     # ---- Webhook (B3) ----
     "Webhook Details":            [r"PaymentWebhook", r"RefundWebhook", r"OutgoingWebhook"],
+    "Outgoing Webhook Custom Headers": [r"updatebusinessprofilewebhookcustomheaders", r"webhookcustomheaders", r"webhook_custom_http_headers", r"custom webhook headers"],
+    "Redirect Method":            [r"merchant redirect method", r"52-merchantredirectmethod", r"redirect_to_merchant_with_http_post"],
+    "Product Type":               [r"merchant account product type", r"00003-producttype", r"product_type"],
 
     # ---- Customer / Mandate / Sync / Sav (B3) ----
     "Customer Management":        [r"CustomerCreate", r"CustomerList", r"DeletedCustomerPsync", r"CustomerFlow"],
@@ -746,6 +866,8 @@ FEATURE_SPEC_PATTERNS = {
 
     # ---- Misc B3 ----
     "Eligibility Check":          [r"PaymentsEligibility", r"Eligibility"],
+    "Authentication Service Eligibility":  [r"AuthenticationServiceEligibility", r"Authentication Service Eligibility"],
+    "Eligibility Data Storage For Auth":   [r"AuthenticationServiceEligibility", r"eligibility.*storage", r"store_eligibility"],
     "Connector Agnostic MIT":     [r"ConnectorAgnosticNTID", r"ConnectorAgnosticMIT"],
     "External Vault":             [r"ExternalVault"],
     "External 3DS Authentication": [r"ExternalThreeDS", r"External3DS"],
@@ -767,6 +889,14 @@ FEATURE_SPEC_PATTERNS = {
     "Incremental Authorization":   [r"IncrementalAuth"],
     "Overcapture":                 [r"Overcapture"],
     "Network Transaction ID":      [r"NetworkTransactionId", r"NTID"],
+    "L2/L3 Data Processing":       [r"L2L3Data", r"L2L3", r"LevelTwo", r"LevelThree"],
+
+    # ---- B3 features whose spec files were not previously mapped ----
+    "Use Billing As PM Billing":   [r"UseBillingAsPaymentMethodBilling", r"Use Billing As Payment Method Billing"],
+    "Session Expiry":              [r"SessionExpiry", r"session_expiry"],
+    "Card Issuer Management":      [r"CardIssuerManagement", r"Card Issuer Management"],
+    "Feature Metadata":            [r"FeatureMetadata", r"feature_metadata"],
+    "Connector Metadata":          [r"FeatureMetadata", r"feature_metadata"],   # covered by the same Feature Metadata spec
 }
 
 
@@ -841,6 +971,35 @@ def report_orphan_specs(spec_index):
             print(f"    … and {len(set(orphans)) - 20} more", file=sys.stderr)
 
 
+def report_orphan_include_lists(include_lists):
+    """
+    Log any Utils.js INCLUDE list key that is not documented in
+    UTILS_INCLUDE_FEATURE_MAP. These are new entries added by recent Cypress
+    PRs that have not yet been mapped to a feature — coverage for those
+    connectors will be silently wrong until an entry is added to the map.
+
+    This is the analogue of report_orphan_specs() for INCLUDE lists.
+    """
+    # __EXCLUDE__ is an internal sentinel added by parse_cypress_configs()
+    known = set(UTILS_INCLUDE_FEATURE_MAP.keys()) | {"__EXCLUDE__"}
+    orphans = sorted(k for k in include_lists if k not in known)
+    if orphans:
+        print(
+            f"\n  [ACTION REQUIRED] {len(orphans)} Utils.js INCLUDE list(s) are not in "
+            f"UTILS_INCLUDE_FEATURE_MAP — cypress coverage for these connectors will NOT "
+            f"be reflected until you add entries to the map:",
+            file=sys.stderr,
+        )
+        for k in orphans:
+            connectors = sorted(include_lists[k])
+            print(f"    - {k}: {connectors}", file=sys.stderr)
+        print(
+            "  Add each key to UTILS_INCLUDE_FEATURE_MAP in extract_features.py "
+            "(set value to feature name for B1, or None for B2/B3/structural).\n",
+            file=sys.stderr,
+        )
+
+
 # ---- Bucket 3: Core features (static list - these don't change with connector code) ----
 BUCKET_3_FEATURES = [
     ("Routing Algorithm", "Payment routing rules and algorithm", "POST /routing + GET /routing/{id}", "business_profile.rs:routing_algorithm", "covered", "Cypress specs: PriorityRouting VolumeBasedRouting RuleBasedRouting"),
@@ -882,16 +1041,16 @@ BUCKET_3_FEATURES = [
     ("CVV Collection During Payment", "Collect CVV during payment for saved cards", "POST /payments (CVV collection behavior)", "business_profile.rs:should_collect_cvv_during_payment", "not_covered", ""),
     ("Split Transactions Enabled", "Enable split transaction feature", "POST /business_profile (split_txns_enabled)", "business_profile.rs:split_txns_enabled", "not_covered", ""),
     ("Webhook Config Disabled Events", "Disable specific webhook events per connector", "POST /business_profile (webhook config)", "configs table:whconf_disabled_events", "not_covered", ""),
-    ("Outgoing Webhook Custom Headers", "Custom HTTP headers for outgoing webhooks", "POST /business_profile (custom headers)", "business_profile.rs:outgoing_webhook_custom_http_headers", "not_covered", ""),
+    ("Outgoing Webhook Custom Headers", "Custom HTTP headers for outgoing webhooks", "POST /business_profile (custom headers)", "business_profile.rs:outgoing_webhook_custom_http_headers", "covered", "Cypress spec 28-BusinessProfileConfigs (updateBusinessProfileWebhookCustomHeaders)"),
     ("Webhook Details", "Webhook URL and event configuration", "POST /business_profile (webhook_details)", "business_profile.rs:webhook_details", "covered", "Cypress specs 44-PaymentWebhook 45-RefundWebhook"),
     ("Card Testing Guard", "Anti-card-testing fraud detection", "POST /payments (internal fraud guard)", "business_profile.rs:card_testing_guard_config", "not_covered", ""),
     ("Payment Response Hash", "Sign payment response for integrity verification", "POST /payments (hash in response)", "business_profile.rs:enable_payment_response_hash", "not_covered", ""),
-    ("Redirect Method", "POST vs GET for merchant redirect", "POST /payments (redirect behavior)", "business_profile.rs:redirect_to_merchant_with_http_post", "not_covered", ""),
+    ("Redirect Method", "POST vs GET for merchant redirect", "POST /payments (redirect behavior)", "business_profile.rs:redirect_to_merchant_with_http_post", "covered", "Cypress spec 52-MerchantRedirectMethod (PR #12200)"),
     ("Session Expiry", "Client secret / session expiry time", "POST /payments (session timeout)", "business_profile.rs:session_expiry", "not_covered", ""),
     ("Reconciliation", "Payment reconciliation feature", "Recon API endpoints", "business_profile.rs:is_recon_enabled", "not_covered", ""),
     ("Sub-Merchants", "Sub-merchant management feature", "POST /merchant_account (sub_merchants_enabled)", "merchant_account.rs:sub_merchants_enabled", "not_covered", ""),
     ("Platform Account", "Platform/marketplace account type", "POST /organization + POST /merchant_account", "merchant_account.rs:is_platform_account", "covered", "Cypress Platform/ test suite"),
-    ("Product Type", "Merchant product type (Payments/Payouts)", "POST /merchant_account (product_type)", "merchant_account.rs:product_type", "not_covered", ""),
+    ("Product Type", "Merchant product type (Payments/Payouts)", "POST /merchant_account (product_type)", "merchant_account.rs:product_type", "covered", "Cypress spec 00003-ProductType in Misc/ (PR #12029)"),
     ("Merchant Category Code", "Merchant category code (MCC)", "POST /business_profile (merchant_category_code)", "business_profile.rs:merchant_category_code", "not_covered", ""),
     ("Merchant Country Code", "Numeric merchant country code", "POST /business_profile (merchant_country_code)", "business_profile.rs:merchant_country_code", "not_covered", ""),
     ("Dispute Polling Interval", "Polling interval for dispute sync", "POST /business_profile (dispute_polling_interval)", "business_profile.rs:dispute_polling_interval", "not_covered", ""),
@@ -1063,6 +1222,7 @@ def main():
 
     cypress_configs, include_lists = parse_cypress_configs()
     print(f"  Parsed {len(cypress_configs)} cypress connector configs", file=sys.stderr)
+    report_orphan_include_lists(include_lists)
 
     # ---- Bucket 1 ----
     print("  Generating Bucket 1...", file=sys.stderr)
@@ -1084,8 +1244,19 @@ def main():
     for c, feat, desc, ep in detect_refund_support():
         b1_rows.add((c, feat, desc, ep))
 
+    # Filter excluded connectors and specific flow combinations
+    b1_filtered = set()
+    for c, feat, desc, ep in b1_rows:
+        # Skip entirely excluded connectors
+        if c.lower() in EXCLUDED_CONNECTORS:
+            continue
+        # Skip excluded connector+flow combinations
+        if (c.lower(), feat) in EXCLUDED_FLOW_COMBINATIONS:
+            continue
+        b1_filtered.add((c, feat, desc, ep))
+
     # Deduplicate and sort
-    b1_sorted = sorted(b1_rows, key=lambda x: (x[1], x[0]))
+    b1_sorted = sorted(b1_filtered, key=lambda x: (x[1], x[0]))
 
     # Add cypress status
     b1_out = os.path.join(REPO_ROOT, "bucket_1_connector_features.csv")
@@ -1183,7 +1354,11 @@ def main():
     b3_out = os.path.join(REPO_ROOT, "bucket_3_core_features.csv")
     b3_rows_resolved = []  # parallel list with cypress_status overridden
     overrides = 0
-    for row in BUCKET_3_FEATURES:
+    
+    # Filter out excluded Bucket 3 features
+    b3_filtered = [row for row in BUCKET_3_FEATURES if row[0] not in EXCLUDED_FEATURES_BUCKET3]
+    
+    for row in b3_filtered:
         feature = row[0]
         hardcoded_status = row[4]
         detected = feature_covered_by_specs(feature, spec_index)
@@ -1225,6 +1400,8 @@ def main():
     # Surface any spec files we don't recognize — these are gaps the team can
     # close by adding entries to FEATURE_SPEC_PATTERNS.
     report_orphan_specs(spec_index)
+    # Surface any new Utils.js INCLUDE lists not yet mapped to features.
+    report_orphan_include_lists(include_lists)
 
     db_conn.close()
 

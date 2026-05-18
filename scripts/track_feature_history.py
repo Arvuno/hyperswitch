@@ -245,35 +245,67 @@ def main():
         "--csv", default="feature_history.csv",
         help="Output CSV filename, written to repo root (default: feature_history.csv)",
     )
+    parser.add_argument(
+        "--head-tag", default=None, metavar="TAG",
+        help=(
+            "Snapshot the current HEAD under TAG and append it as the final entry "
+            "(e.g. --head-tag 2026.05.13.0). Use when the tag hasn't been cut yet "
+            "but you want to preview coverage at HEAD."
+        ),
+    )
     args = parser.parse_args()
 
-    tags = get_tags(args.tags)
-    if not tags:
-        print("ERROR: No daily tags found matching YYYY.MM.DD.N pattern.", file=sys.stderr)
-        sys.exit(1)
-
-    print(f"Scanning {len(tags)} tags: {tags[0]}  →  {tags[-1]}", file=sys.stderr)
-    print(f"  (baseline = {tags[0]}, new features compared against previous tag)", file=sys.stderr)
-
-    worktree = tempfile.mkdtemp(prefix="hs_hist_")
-    tag_features: dict[str, frozenset] = {}
-    tag_covered: dict[str, frozenset] = {}
+    # If --head-tag was requested, create a lightweight local tag so get_tags()
+    # picks it up normally, then clean it up after the run.
+    _head_tag_created = False
+    if args.head_tag:
+        existing = run(["git", "tag", "-l", args.head_tag]).strip()
+        if not existing:
+            run(["git", "tag", args.head_tag, "HEAD"])
+            _head_tag_created = True
+            print(f"  Tagged HEAD as {args.head_tag} (temporary)", file=sys.stderr)
+        else:
+            print(f"  Tag {args.head_tag} already exists, using it as-is", file=sys.stderr)
 
     try:
-        run(["git", "worktree", "add", "--detach", worktree, tags[0]])
+        tags = get_tags(args.tags)
+        if not tags:
+            print("ERROR: No daily tags found matching YYYY.MM.DD.N pattern.", file=sys.stderr)
+            sys.exit(1)
 
-        for i, tag in enumerate(tags):
-            print(f"  [{i+1:2d}/{len(tags)}] {tag} ...", file=sys.stderr, end="", flush=True)
-            if i > 0:
-                run(["git", "-C", worktree, "checkout", "--detach", tag])
-            feats, covered = collect_features(worktree)
-            tag_features[tag] = feats
-            tag_covered[tag] = covered
-            print(f"  {len(feats):5d} features, {len(covered):5d} cypress-covered", file=sys.stderr)
+        # Ensure the requested head tag is the final entry even if --tags N
+        # happened to exclude it due to count.
+        if args.head_tag and args.head_tag not in tags:
+            tags.append(args.head_tag)
+
+        print(f"Scanning {len(tags)} tags: {tags[0]}  →  {tags[-1]}", file=sys.stderr)
+        print(f"  (baseline = {tags[0]}, new features compared against previous tag)", file=sys.stderr)
+
+        worktree = tempfile.mkdtemp(prefix="hs_hist_")
+        tag_features: dict[str, frozenset] = {}
+        tag_covered: dict[str, frozenset] = {}
+
+        try:
+            run(["git", "worktree", "add", "--detach", worktree, tags[0]])
+
+            for i, tag in enumerate(tags):
+                print(f"  [{i+1:2d}/{len(tags)}] {tag} ...", file=sys.stderr, end="", flush=True)
+                if i > 0:
+                    run(["git", "-C", worktree, "checkout", "--detach", tag])
+                feats, covered = collect_features(worktree)
+                tag_features[tag] = feats
+                tag_covered[tag] = covered
+                print(f"  {len(feats):5d} features, {len(covered):5d} cypress-covered", file=sys.stderr)
+
+        finally:
+            run(["git", "worktree", "remove", "--force", worktree], check=False)
+            shutil.rmtree(worktree, ignore_errors=True)
 
     finally:
-        run(["git", "worktree", "remove", "--force", worktree], check=False)
-        shutil.rmtree(worktree, ignore_errors=True)
+        # Always remove the temporary tag regardless of success or failure
+        if _head_tag_created:
+            run(["git", "tag", "-d", args.head_tag], check=False)
+            print(f"  Removed temporary tag {args.head_tag}", file=sys.stderr)
 
     # ------------------------------------------------------------------ #
     # Feature introductions: in tag N but not tag N-1                      #
@@ -321,6 +353,42 @@ def main():
     )
     conn.commit()
     conn.close()
+
+    # ------------------------------------------------------------------ #
+    # Sync issues table from the latest tag's tag_snapshots               #
+    #                                                                      #
+    # extract_features.py runs its spec-walk against the CURRENT working  #
+    # tree, so when a cypress spec file lands on main but the working      #
+    # branch hasn't merged it yet, issues.cypress_status stays             #
+    # 'not_covered' even though the tag worktree (scanned above) detected  #
+    # it as covered.  Syncing here closes that gap automatically after     #
+    # every track_feature_history run.                                     #
+    # ------------------------------------------------------------------ #
+    latest_tag = tags[-1]
+    conn = sqlite3.connect(DB_PATH)
+    synced = conn.execute("""
+        UPDATE issues
+        SET cypress_status = CASE WHEN ts.is_covered = 1 THEN 'covered' ELSE 'not_covered' END,
+            status = CASE
+                WHEN ts.is_covered = 1                          THEN 'covered'
+                WHEN issues.status = 'covered' AND ts.is_covered = 0 THEN 'open'
+                ELSE issues.status
+            END,
+            updated_at = CURRENT_TIMESTAMP
+        FROM tag_snapshots ts
+        WHERE ts.tag        = ?
+          AND ts.bucket     = issues.bucket
+          AND ts.connector  = issues.connector
+          AND ts.pm         = issues.pm
+          AND ts.pmt        = issues.pmt
+          AND ts.feature    = issues.feature
+          AND ts.is_covered != (CASE WHEN issues.cypress_status = 'covered' THEN 1 ELSE 0 END)
+    """, (latest_tag,)).rowcount
+    conn.commit()
+    conn.close()
+    if synced:
+        print(f"  Synced {synced} issues row(s) from latest tag snapshot ({latest_tag})",
+              file=sys.stderr)
 
     # ------------------------------------------------------------------ #
     # CSVs                                                                  #
