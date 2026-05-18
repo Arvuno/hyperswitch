@@ -896,8 +896,11 @@ FEATURE_SPEC_PATTERNS = {
     # ---- B3 features covered implicitly by StepUpAuth spec ----
     # 47-StepUpAuth.cy.js calls UpdateBusinessProfileTest with merchant_country_code
     # and merchant_category_code, exercising these business profile fields.
+    # It also exercises the external 3DS authentication flow end-to-end
+    # (authentication connector creation + 3DS authentication endpoint calls).
     "Merchant Category Code":      [r"StepUpAuth", r"step.up auth"],
     "Merchant Country Code":       [r"StepUpAuth", r"step.up auth"],
+    "External 3DS Authentication": [r"StepUpAuth", r"step.up auth", r"ExternalThreeDS", r"External3DS"],
 
     # ---- B3 features whose spec files were not previously mapped ----
     "Use Billing As PM Billing":   [r"UseBillingAsPaymentMethodBilling", r"Use Billing As Payment Method Billing"],
