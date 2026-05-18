@@ -19,6 +19,24 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2026.05.14.0,2,globalpay,BankRedirect,Giropay,Payment
 2026.05.14.0,2,globalpay,BankRedirect,Ideal,Payment
 2026.05.14.0,2,globalpay,BankRedirect,Sofort,Payment
+2026.05.15.0,1,adyen,,,Step Up Retry
+2026.05.15.0,1,airwallex,,,Step Up Retry
+2026.05.15.0,1,authorizedotnet,,,Step Up Retry
+2026.05.15.0,1,bankofamerica,,,Step Up Retry
+2026.05.15.0,1,checkout,,,Step Up Retry
+2026.05.15.0,1,cybersource,,,Step Up Retry
+2026.05.15.0,1,datatrans,,,Step Up Retry
+2026.05.15.0,1,fiuu,,,Step Up Retry
+2026.05.15.0,1,globalpay,,,Step Up Retry
+2026.05.15.0,1,nexinets,,,Step Up Retry
+2026.05.15.0,1,nmi,,,Step Up Retry
+2026.05.15.0,1,nuvei,,,Step Up Retry
+2026.05.15.0,1,paypal,,,Step Up Retry
+2026.05.15.0,1,shift4,,,Step Up Retry
+2026.05.15.0,1,stripe,,,Step Up Retry
+2026.05.15.0,1,trustpay,,,Step Up Retry
+2026.05.15.0,1,worldpay,,,Step Up Retry
+2026.05.15.0,1,worldpayvantiv,,,Step Up Retry
 2026.05.15.0,3,,,,Outgoing Webhook Custom Headers
 2026.05.15.0,3,,,,Payout Routing Algorithm
 2026.05.17.0,2,mifinity,Wallet,Mifinity,Payment

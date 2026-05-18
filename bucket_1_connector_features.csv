@@ -141,3 +141,21 @@ stripe,Split Refunds,"Refund a split payment proportionally across the original 
 xendit,Split Refunds,"Refund a split payment proportionally across the original split recipients",POST /refunds (split_refunds in body),not_covered
 barclaycard,Step Up Authentication,"Trigger a 3DS step-up challenge when a prior frictionless flow is deemed insufficient by the issuer",POST /payments (internal 3DS2 step-up redirect),not_covered
 cybersource,Step Up Authentication,"Trigger a 3DS step-up challenge when a prior frictionless flow is deemed insufficient by the issuer",POST /payments (internal 3DS2 step-up redirect),covered
+adyen,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+airwallex,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+authorizedotnet,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+bankofamerica,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+checkout,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+cybersource,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+datatrans,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+fiuu,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+globalpay,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+nexinets,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+nmi,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+nuvei,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+paypal,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+shift4,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+stripe,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+trustpay,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+worldpay,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered
+worldpayvantiv,Step Up Retry,"Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",POST /payments (GSM step_up_possible flow),covered

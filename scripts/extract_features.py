@@ -726,6 +726,8 @@ UTILS_INCLUDE_FEATURE_MAP = {
     "PARTNER_MERCHANT_IDENTIFIER":       "Partner Merchant Identifier",
     "EXTEND_AUTHORIZATION":              "Extended Authorization",
     "STEP_UP_AUTH":                      "Step Up Authentication",
+    "STEP_UP_RETRY":                     "Step Up Retry",           # B1: GSM-driven step-up retry
+    "PRE_AUTHENTICATION":                "Pre-Authentication Flow", # B1: pre-auth 3DS flow
     "GIFT_CARD":                         "Balance Check Flow",
     "CONNECTOR_TESTING_DATA":            "Connector Testing Data",
     "PARTIAL_AUTH":                      "Partial Authorization",
@@ -749,6 +751,14 @@ UTILS_INCLUDE_FEATURE_MAP = {
     # ---- B2: PM-level coverage — not a per-connector B1 flag ----
     "BANK_DEBIT":                        None,   # B2: BankDebit PM coverage
     "PAY_LATER":                         None,   # B2: PayLater PM coverage
+    "ALIPAY_HK_WALLET":                  None,   # B2: Wallet/AliPayHk (already covered via wallet_pm)
+    "BLUECODE_WALLET":                   None,   # B2: Wallet/Bluecode (already covered)
+    "MIFINITY_WALLET":                   None,   # B2: Wallet/Mifinity (already covered)
+    "PAYPAL_WALLET":                     None,   # B2: Wallet/Paypal (already covered)
+    "PAYPAL_MANDATE":                    None,   # B2: Wallet/Paypal/Mandate (covered via pm_mandate)
+
+    # ---- B3: B3 feature, detected via FEATURE_SPEC_PATTERNS ----
+    "CARD_TESTING_GUARD":                None,   # B3: Card Testing Guard
 
     # ---- Structural: test infrastructure, no corresponding feature row ----
     "DDC_RACE_CONDITION":                None,   # worldpay DDC timing test
@@ -912,6 +922,7 @@ FEATURE_SPEC_PATTERNS = {
     "Network Transaction ID":      [r"NetworkTransactionId", r"NTID"],
     "L2/L3 Data Processing":       [r"L2L3Data", r"L2L3", r"LevelTwo", r"LevelThree"],
     "Step Up Authentication":      [r"StepUpAuth", r"step.up auth"],
+    "Step Up Retry":               [r"StepUpRetr", r"step.up retry", r"step.up retries"],
 
     # ---- B3 features covered implicitly by StepUpAuth spec ----
     # 47-StepUpAuth.cy.js calls UpdateBusinessProfileTest with merchant_country_code
@@ -1274,6 +1285,25 @@ def main():
     # Method 4: Refund support (connector-level, sourced from SUPPORTED_PAYMENT_METHODS)
     for c, feat, desc, ep in detect_refund_support():
         b1_rows.add((c, feat, desc, ep))
+
+    # Method 5: INCLUDE-list-derived B1 features (GSM/config-driven, not detectable from Rust code)
+    # Each UTILS_INCLUDE_FEATURE_MAP entry that maps to a feature name AND whose include list
+    # key ends with a known GSM/config-driven feature prefix is used to derive B1 rows.
+    INCLUDE_DERIVED_B1 = {
+        "STEP_UP_RETRY": (
+            "Step Up Retry",
+            "Payment that fails without 3DS is automatically retried with a 3DS step-up challenge",
+            "POST /payments (GSM step_up_possible flow)",
+        ),
+        "PRE_AUTHENTICATION": (
+            "Pre-Authentication Flow",
+            "Initiate 3DS pre-authentication before the payment authorization request",
+            "POST /payments/pre_auth (3DS pre-auth endpoint)",
+        ),
+    }
+    for list_name, (feat, desc, ep) in INCLUDE_DERIVED_B1.items():
+        for connector in include_lists.get(list_name, set()):
+            b1_rows.add((connector, feat, desc, ep))
 
     # Filter excluded connectors and specific flow combinations
     b1_filtered = set()
