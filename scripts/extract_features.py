@@ -712,6 +712,7 @@ UTILS_INCLUDE_FEATURE_MAP = {
     "EXTERNAL_THREE_DS":                 "External 3DS Authentication",
     "PARTNER_MERCHANT_IDENTIFIER":       "Partner Merchant Identifier",
     "EXTEND_AUTHORIZATION":              "Extended Authorization",
+    "STEP_UP_AUTH":                      "Step Up Authentication",
     "GIFT_CARD":                         "Balance Check Flow",
     "CONNECTOR_TESTING_DATA":            "Connector Testing Data",
     "PARTIAL_AUTH":                      "Partial Authorization",
@@ -890,6 +891,13 @@ FEATURE_SPEC_PATTERNS = {
     "Overcapture":                 [r"Overcapture"],
     "Network Transaction ID":      [r"NetworkTransactionId", r"NTID"],
     "L2/L3 Data Processing":       [r"L2L3Data", r"L2L3", r"LevelTwo", r"LevelThree"],
+    "Step Up Authentication":      [r"StepUpAuth", r"step.up auth"],
+
+    # ---- B3 features covered implicitly by StepUpAuth spec ----
+    # 47-StepUpAuth.cy.js calls UpdateBusinessProfileTest with merchant_country_code
+    # and merchant_category_code, exercising these business profile fields.
+    "Merchant Category Code":      [r"StepUpAuth", r"step.up auth"],
+    "Merchant Country Code":       [r"StepUpAuth", r"step.up auth"],
 
     # ---- B3 features whose spec files were not previously mapped ----
     "Use Billing As PM Billing":   [r"UseBillingAsPaymentMethodBilling", r"Use Billing As Payment Method Billing"],
