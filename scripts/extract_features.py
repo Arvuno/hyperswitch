@@ -613,7 +613,7 @@ def parse_cypress_configs():
         if "split_refunds" in content or "SplitRefund" in content:
             features.add("Split Refunds")
 
-        # Per-PM-section mandate and refund coverage.
+        # Per-PM-section mandate, refund, and PMT coverage.
         # We scan a window of text starting at each PM section header so that a
         # Mandate test defined only in card_pm does NOT accidentally mark
         # wallet_pm or bank_debit_pm as having mandate coverage.
@@ -622,6 +622,7 @@ def parse_cypress_configs():
         _WINDOW = 20_000
         pm_mandate: set = set()
         pm_refund: set = set()
+        pm_pmts: dict = {}   # pm_cat -> set of lowercase PMT names found in that section
         for cat in pm_types:
             idx = content.find(f"{cat}:")
             if idx == -1:
@@ -633,16 +634,23 @@ def parse_cypress_configs():
                 pm_mandate.add(cat)
             if re.search(r'Refund\s*:', chunk):
                 pm_refund.add(cat)
+            # Extract payment_method_type values within this PM section
+            pmts_found = set(re.findall(r'payment_method_type\s*:\s*["\'](\w+)["\']', chunk))
+            if pmts_found:
+                pm_pmts.setdefault(cat, set()).update(pmts_found)
 
         # Merge into existing config if alias was used (e.g. StripeConnect into stripe)
         existing = configs.get(connector, {
             "pm_types": set(), "features": set(),
             "pm_mandate": set(), "pm_refund": set(),
+            "pm_pmts": {},
         })
         existing["pm_types"]   |= pm_types
         existing["features"]   |= features
         existing["pm_mandate"] |= pm_mandate
         existing["pm_refund"]  |= pm_refund
+        for cat, pmts in pm_pmts.items():
+            existing["pm_pmts"].setdefault(cat, set()).update(pmts)
         configs[connector] = existing
 
     # Parse INCLUDE and EXCLUDE lists from Utils.js
@@ -805,6 +813,13 @@ def get_cypress_status_bucket2(connector, pm, pmt, feature, cypress_configs):
         return "not_covered"
 
     if feature == "Payment":
+        # For PM categories where configs specify individual PMTs (e.g. pay_later_pm,
+        # real_time_payment_pm), check that this exact PMT is configured — not just
+        # the PM category.  For PM categories that don't use payment_method_type
+        # (e.g. card_pm, wallet_pm), fall back to PM-category-level detection.
+        pm_pmts = cfg.get("pm_pmts", {}).get(pm_cat)
+        if pm_pmts:
+            return "covered" if pmt.lower() in pm_pmts else "not_covered"
         return "covered"
 
     # Mandate and Refund are checked per-PM-section (not file-wide) so that a
