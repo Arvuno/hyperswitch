@@ -1,12 +1,12 @@
 connector,payment_method,payment_method_type,feature,description,hs_endpoint,cypress_test_status
-aci,BankRedirect,Eft,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+aci,BankRedirect,Eft,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 aci,BankRedirect,Eps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 aci,BankRedirect,Giropay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 aci,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 aci,BankRedirect,Interac,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 aci,BankRedirect,Przelewy24,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 aci,BankRedirect,Sofort,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-aci,BankRedirect,Trustly,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+aci,BankRedirect,Trustly,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 aci,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 aci,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 aci,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
@@ -23,30 +23,30 @@ adyen,BankDebit,Bacs,Payment,"Base payment authorization for this connector + PM
 adyen,BankDebit,Bacs,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 adyen,BankDebit,Sepa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankDebit,Sepa,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,BankRedirect,BancontactCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,BankRedirect,BancontactCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankRedirect,BancontactCard,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,BankRedirect,Bizum,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,BankRedirect,Bizum,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankRedirect,Blik,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankRedirect,Eps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankRedirect,Ideal,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,BankRedirect,OnlineBankingCzechRepublic,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankRedirect,OnlineBankingFinland,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankRedirect,OnlineBankingFpx,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankRedirect,OnlineBankingPoland,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankRedirect,OnlineBankingSlovakia,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankRedirect,OnlineBankingThailand,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankRedirect,OpenBankingUk,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,BankRedirect,OnlineBankingCzechRepublic,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankRedirect,OnlineBankingFinland,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankRedirect,OnlineBankingFpx,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankRedirect,OnlineBankingPoland,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankRedirect,OnlineBankingSlovakia,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankRedirect,OnlineBankingThailand,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankRedirect,OpenBankingUk,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankRedirect,OpenBankingUk,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,BankRedirect,Trustly,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,BankRedirect,Trustly,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankRedirect,Trustly,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,BankTransfer,BcaBankTransfer,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankTransfer,BniVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankTransfer,BriVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankTransfer,CimbVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankTransfer,DanamonVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankTransfer,MandiriVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,BankTransfer,PermataBankTransfer,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,BankTransfer,BcaBankTransfer,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankTransfer,BniVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankTransfer,BriVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankTransfer,CimbVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankTransfer,DanamonVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankTransfer,MandiriVa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,BankTransfer,PermataBankTransfer,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,BankTransfer,Pix,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
@@ -56,7 +56,7 @@ adyen,CardRedirect,Benefit,Payment,"Base payment authorization for this connecto
 adyen,CardRedirect,Knet,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 adyen,CardRedirect,MomoAtm,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 adyen,GiftCard,Givex,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-adyen,GiftCard,PaySafeCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,GiftCard,PaySafeCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,PayLater,Affirm,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 adyen,PayLater,AfterpayClearpay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 adyen,PayLater,Alma,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
@@ -75,35 +75,35 @@ adyen,Voucher,Oxxo,Payment,"Base payment authorization for this connector + PM +
 adyen,Voucher,PayEasy,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 adyen,Voucher,Seicomart,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 adyen,Voucher,SevenEleven,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,AliPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,AliPayHk,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,AliPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,Wallet,AliPayHk,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,ApplePay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,Dana,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,Dana,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,Dana,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,Gcash,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,Gcash,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,Gcash,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,GoPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,GoPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,GoPay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,GooglePay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,KakaoPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,KakaoPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,KakaoPay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,MbWay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,MobilePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,Momo,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,MbWay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,Wallet,MobilePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,Wallet,Momo,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,Momo,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,Paypal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,Paypal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,Paypal,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,Paze,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,SamsungPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,Swish,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,TouchNGo,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-adyen,Wallet,Twint,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,Paze,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,Wallet,SamsungPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,Wallet,Swish,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,Wallet,TouchNGo,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+adyen,Wallet,Twint,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,Twint,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,Vipps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,Vipps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 adyen,Wallet,Vipps,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-adyen,Wallet,WeChatPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+adyen,Wallet,WeChatPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 affirm,PayLater,Affirm,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 airwallex,BankRedirect,Blik,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 airwallex,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
@@ -119,13 +119,13 @@ airwallex,Wallet,GooglePay,Payment,"Base payment authorization for this connecto
 airwallex,Wallet,Paypal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 airwallex,Wallet,Skrill,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 amazonpay,Wallet,AmazonPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
-archipel,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+archipel,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 archipel,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 archipel,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 archipel,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 archipel,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 authipay,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-authipay,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+authipay,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 authorizedotnet,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 authorizedotnet,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 authorizedotnet,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
@@ -149,7 +149,7 @@ bankofamerica,Wallet,ApplePay,Mandate,"Recurring/stored credential mandate setup
 bankofamerica,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 bankofamerica,Wallet,GooglePay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 bankofamerica,Wallet,SamsungPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-barclaycard,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+barclaycard,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 barclaycard,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 barclaycard,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 barclaycard,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
@@ -175,7 +175,7 @@ braintree,Wallet,GooglePay,Payment,"Base payment authorization for this connecto
 braintree,Wallet,Paypal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 breadpay,PayLater,Breadpay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 calida,Wallet,Bluecode,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-cashtocode,Reward,ClassicReward,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+cashtocode,Reward,ClassicReward,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 cashtocode,Reward,Evoucher,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 celero,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 celero,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
@@ -184,12 +184,12 @@ checkout,Card,Credit,Payment,"Base payment authorization for this connector + PM
 checkout,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 checkout,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 checkout,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
-checkout,NetworkToken,NetworkToken,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+checkout,NetworkToken,NetworkToken,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 checkout,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 checkout,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 coinbase,Crypto,CryptoCurrency,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 coingate,Crypto,CryptoCurrency,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
-cryptopay,Crypto,CryptoCurrency,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+cryptopay,Crypto,CryptoCurrency,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 cybersource,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 cybersource,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 cybersource,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
@@ -202,7 +202,7 @@ cybersource,Wallet,Paze,Payment,"Base payment authorization for this connector +
 cybersource,Wallet,Paze,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 cybersource,Wallet,SamsungPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 cybersource,Wallet,SamsungPay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-datatrans,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+datatrans,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 datatrans,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 datatrans,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 datatrans,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
@@ -215,7 +215,7 @@ dlocal,Card,Credit,Payment,"Base payment authorization for this connector + PM +
 dlocal,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 dlocal,Voucher,Oxxo,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 dwolla,BankDebit,Ach,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
-elavon,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+elavon,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 elavon,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 elavon,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 elavon,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
@@ -237,10 +237,10 @@ fiservcommercehub,Card,Credit,Payment,"Base payment authorization for this conne
 fiservcommercehub,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 fiservemea,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 fiservemea,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-fiuu,BankRedirect,OnlineBankingFpx,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+fiuu,BankRedirect,OnlineBankingFpx,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 fiuu,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 fiuu,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
-fiuu,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+fiuu,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 fiuu,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 fiuu,RealTimePayment,DuitNow,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 fiuu,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
@@ -285,13 +285,13 @@ hyperpg,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this 
 hyperpg,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 hyperpg,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",no_cypress_config
 iatapay,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-iatapay,BankRedirect,LocalBankRedirect,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+iatapay,BankRedirect,LocalBankRedirect,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 iatapay,RealTimePayment,DuitNow,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 iatapay,RealTimePayment,Fps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 iatapay,RealTimePayment,PromptPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 iatapay,RealTimePayment,VietQr,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-iatapay,Upi,UpiCollect,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-iatapay,Upi,UpiIntent,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+iatapay,Upi,UpiCollect,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+iatapay,Upi,UpiIntent,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 imerchantsolutions,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 imerchantsolutions,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 inespay,BankDebit,Sepa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
@@ -302,7 +302,7 @@ klarna,PayLater,Klarna,Payment,"Base payment authorization for this connector + 
 loonio,BankRedirect,Interac,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 mifinity,Wallet,Mifinity,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 mollie,BankDebit,Sepa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-mollie,BankRedirect,BancontactCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+mollie,BankRedirect,BancontactCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 mollie,BankRedirect,Eps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 mollie,BankRedirect,Giropay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 mollie,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
@@ -317,13 +317,13 @@ mollie,Wallet,ApplePay,Payment,"Base payment authorization for this connector + 
 mollie,Wallet,Paypal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 moneris,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 moneris,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
-moneris,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+moneris,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 moneris,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 multisafepay,BankRedirect,Eps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-multisafepay,BankRedirect,Giropay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-multisafepay,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+multisafepay,BankRedirect,Giropay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+multisafepay,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 multisafepay,BankRedirect,Sofort,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-multisafepay,BankRedirect,Trustly,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+multisafepay,BankRedirect,Trustly,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 multisafepay,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 multisafepay,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 multisafepay,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
@@ -368,7 +368,7 @@ noon,Wallet,GooglePay,Mandate,"Recurring/stored credential mandate setup for thi
 noon,Wallet,Paypal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 novalnet,BankDebit,Sepa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 novalnet,BankDebit,Sepa,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-novalnet,BankDebit,SepaGuarenteedDebit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+novalnet,BankDebit,SepaGuarenteedDebit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 novalnet,BankDebit,SepaGuarenteedDebit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 novalnet,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 novalnet,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
@@ -388,7 +388,7 @@ nuvei,Card,Credit,Payment,"Base payment authorization for this connector + PM + 
 nuvei,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 nuvei,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 nuvei,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
-nuvei,NetworkToken,NetworkToken,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+nuvei,NetworkToken,NetworkToken,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 nuvei,PayLater,AfterpayClearpay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 nuvei,PayLater,Klarna,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 nuvei,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
@@ -444,7 +444,7 @@ payu,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM
 payu,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 peachpayments,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 peachpayments,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-peachpayments,NetworkToken,NetworkToken,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+peachpayments,NetworkToken,NetworkToken,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 phonepe,Upi,UpiCollect,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 phonepe,Upi,UpiIntent,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 placetopay,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
@@ -492,21 +492,21 @@ stripe,BankDebit,Becs,Payment,"Base payment authorization for this connector + P
 stripe,BankDebit,Becs,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 stripe,BankDebit,Sepa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 stripe,BankDebit,Sepa,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-stripe,BankRedirect,BancontactCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+stripe,BankRedirect,BancontactCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,BancontactCard,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 stripe,BankRedirect,Blik,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Eps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Giropay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Ideal,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-stripe,BankRedirect,OnlineBankingFpx,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+stripe,BankRedirect,OnlineBankingFpx,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Przelewy24,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-stripe,BankRedirect,Sofort,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+stripe,BankRedirect,Sofort,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Sofort,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 stripe,BankTransfer,Ach,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-stripe,BankTransfer,Bacs,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-stripe,BankTransfer,Multibanco,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-stripe,BankTransfer,SepaBankTransfer,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+stripe,BankTransfer,Bacs,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+stripe,BankTransfer,Multibanco,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+stripe,BankTransfer,SepaBankTransfer,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 stripe,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
@@ -548,15 +548,15 @@ trustpay,BankTransfer,InstantBankTransferPoland,Payment,"Base payment authorizat
 trustpay,BankTransfer,SepaBankTransfer,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 trustpay,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 trustpay,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-trustpay,NetworkToken,NetworkToken,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+trustpay,NetworkToken,NetworkToken,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 trustpay,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 trustpay,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 trustpayments,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 trustpayments,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 tsys,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 tsys,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-volt,BankRedirect,OpenBanking,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-volt,BankRedirect,OpenBankingUk,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+volt,BankRedirect,OpenBanking,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+volt,BankRedirect,OpenBankingUk,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 wellsfargo,BankDebit,Ach,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 wellsfargo,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 wellsfargo,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
@@ -580,7 +580,7 @@ worldpaymodular,Wallet,ApplePay,Payment,"Base payment authorization for this con
 worldpaymodular,Wallet,ApplePay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",no_cypress_config
 worldpaymodular,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 worldpaymodular,Wallet,GooglePay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",no_cypress_config
-worldpayvantiv,Card,Card,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+worldpayvantiv,Card,Card,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 worldpayvantiv,Card,Card,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 worldpayvantiv,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 worldpayvantiv,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
@@ -596,7 +596,7 @@ worldpayxml,Wallet,ApplePay,Payment,"Base payment authorization for this connect
 worldpayxml,Wallet,ApplePay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 worldpayxml,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 worldpayxml,Wallet,GooglePay,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
-xendit,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+xendit,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 xendit,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 xendit,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 xendit,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
@@ -621,9 +621,9 @@ zift,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this conn
 zsl,BankTransfer,LocalBankTransfer,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
 aci,Wallet,ApplePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (ApplePay pre-decrypted token)",not_covered
 aci,Wallet,GooglePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (GooglePay pre-decrypted token)",not_covered
-adyen,Wallet,ApplePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (ApplePay pre-decrypted token)",not_covered
-adyen,Wallet,GooglePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (GooglePay pre-decrypted token)",not_covered
-adyen,Wallet,Paze,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (Paze pre-decrypted token)",not_covered
+adyen,Wallet,ApplePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (ApplePay pre-decrypted token)",covered
+adyen,Wallet,GooglePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (GooglePay pre-decrypted token)",covered
+adyen,Wallet,Paze,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (Paze pre-decrypted token)",covered
 archipel,Wallet,ApplePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (ApplePay pre-decrypted token)",not_covered
 bankofamerica,Wallet,ApplePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (ApplePay pre-decrypted token)",not_covered
 bankofamerica,Wallet,GooglePay,"Payment (Decrypt Flow)","HS pre-decrypts the wallet token and sends plaintext card data to the connector instead of the encrypted blob","POST /payments (GooglePay pre-decrypted token)",not_covered

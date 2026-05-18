@@ -613,7 +613,7 @@ def parse_cypress_configs():
         if "split_refunds" in content or "SplitRefund" in content:
             features.add("Split Refunds")
 
-        # Per-PM-section mandate, refund, and PMT coverage.
+        # Per-PM-section mandate and refund coverage.
         # We scan a window of text starting at each PM section header so that a
         # Mandate test defined only in card_pm does NOT accidentally mark
         # wallet_pm or bank_debit_pm as having mandate coverage.
@@ -622,7 +622,7 @@ def parse_cypress_configs():
         _WINDOW = 20_000
         pm_mandate: set = set()
         pm_refund: set = set()
-        pm_pmts: dict = {}   # pm_cat -> set of lowercase PMT names found in that section
+        pm_pmts: dict = {}   # pm_cat -> set of lowercase PMT names explicitly tested
         for cat in pm_types:
             idx = content.find(f"{cat}:")
             if idx == -1:
@@ -634,10 +634,15 @@ def parse_cypress_configs():
                 pm_mandate.add(cat)
             if re.search(r'Refund\s*:', chunk):
                 pm_refund.add(cat)
-            # Extract payment_method_type values within this PM section
-            pmts_found = set(re.findall(r'payment_method_type\s*:\s*["\'](\w+)["\']', chunk))
-            if pmts_found:
-                pm_pmts.setdefault(cat, set()).update(pmts_found)
+            # For pay_later_pm only: extract explicit payment_method_type values.
+            # PayLater has many PMTs (Klarna, Affirm, AfterpayClearpay, etc.) with
+            # completely different flows — a connector only testing Klarna should NOT
+            # be marked covered for Affirm. For other PM categories (wallet, card,
+            # bank_redirect, etc.) the pm_cat presence is a sufficient proxy.
+            if cat == "pay_later_pm":
+                pmts_found = set(re.findall(r'payment_method_type\s*:\s*["\'](\w+)["\']', chunk))
+                if pmts_found:
+                    pm_pmts[cat] = pmts_found
 
         # Merge into existing config if alias was used (e.g. StripeConnect into stripe)
         existing = configs.get(connector, {
