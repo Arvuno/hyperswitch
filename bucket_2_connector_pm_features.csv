@@ -242,7 +242,7 @@ fiuu,Card,Credit,Payment,"Base payment authorization for this connector + PM + P
 fiuu,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 fiuu,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 fiuu,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
-fiuu,RealTimePayment,DuitNow,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+fiuu,RealTimePayment,DuitNow,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 fiuu,Wallet,ApplePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 fiuu,Wallet,GooglePay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 flexiti,PayLater,Klarna,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config
@@ -286,10 +286,10 @@ hyperpg,Card,Debit,Payment,"Base payment authorization for this connector + PM +
 hyperpg,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",no_cypress_config
 iatapay,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 iatapay,BankRedirect,LocalBankRedirect,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-iatapay,RealTimePayment,DuitNow,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-iatapay,RealTimePayment,Fps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-iatapay,RealTimePayment,PromptPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
-iatapay,RealTimePayment,VietQr,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+iatapay,RealTimePayment,DuitNow,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+iatapay,RealTimePayment,Fps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+iatapay,RealTimePayment,PromptPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
+iatapay,RealTimePayment,VietQr,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 iatapay,Upi,UpiCollect,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 iatapay,Upi,UpiIntent,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 imerchantsolutions,Card,Credit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,no_cypress_config

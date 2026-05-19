@@ -693,7 +693,7 @@ PM_CATEGORY_MAP = {
     "PayLater": "pay_later_pm",
     "BankDebit": "bank_debit_pm",
     "Voucher": "voucher_pm",
-    "RealTimePayment": "real_time_pm",
+    "RealTimePayment": "real_time_payment_pm",
     "GiftCard": "gift_card_pm",
     "OpenBanking": "open_banking_pm",
     "MobilePayment": "mobile_payment_pm",
