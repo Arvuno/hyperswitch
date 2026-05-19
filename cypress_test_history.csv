@@ -1,11 +1,4 @@
 covered_in_tag,bucket,connector,pm,pmt,feature
-2026.05.07.0,1,adyen,,,Extended Authorization
-2026.05.07.0,1,paypal,,,Extended Authorization
-2026.05.07.0,2,adyen,BankDebit,Ach,Payment
-2026.05.07.0,2,adyen,BankDebit,Bacs,Payment
-2026.05.07.0,2,adyen,BankDebit,Sepa,Payment
-2026.05.07.0,3,,,,Dynamic Routing
-2026.05.07.0,3,,,,Routing Result Source
 2026.05.11.0,2,airwallex,PayLater,Klarna,Payment
 2026.05.11.0,2,mollie,PayLater,Klarna,Payment
 2026.05.11.0,3,,,,Routing Evaluate
@@ -50,3 +43,8 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2026.05.18.0,1,cybersource,,,Step Up Authentication
 2026.05.18.0,3,,,,Merchant Category Code
 2026.05.18.0,3,,,,Merchant Country Code
+2026.05.19.0,2,stripe,BankRedirect,BancontactCard,Mandate
+2026.05.19.0,2,stripe,BankRedirect,Ideal,Mandate
+2026.05.19.0,2,stripe,BankRedirect,Sofort,Mandate
+2026.05.19.0,3,,,,Order Details
+2026.05.19.0,3,,,,Relay Operations

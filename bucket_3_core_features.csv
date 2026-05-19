@@ -53,7 +53,7 @@ Dispute Polling Interval,Polling interval for dispute sync,POST /business_profil
 Routing Result Source,Which routing engine to use,POST /payments (read during routing selection),configs table:routing_result_source,covered,
 Poll Config,Payment status polling configuration,GET /payments/{id} (read during redirect payment polling),configs table:poll_config,not_covered,
 Forex/Currency Conversion,Currency conversion for payments,GET /forex/rates,settings.rs:forex_api,not_covered,
-Relay Operations,Relay API for direct connector operations,POST /relay (capture/refund/void/incremental_auth),api_models/relay.rs,not_covered,
+Relay Operations,Relay API for direct connector operations,POST /relay (capture/refund/void/incremental_auth),api_models/relay.rs,covered,
 Subscription Management,Subscription CRUD and lifecycle management,POST/GET/PUT /subscriptions,api_models/subscription.rs,not_covered,
 Dispute Management,Dispute accept/defend/submit evidence,POST /disputes/{id}/accept + POST /disputes/{id}/evidence,api_models/disputes.rs,covered,
 FRM (Fraud Risk Management),Fraud check flows,POST /payments (internal FRM check),merchant_connector_account.rs:frm_configs,not_covered,
@@ -66,7 +66,7 @@ Merchant Account Management,Merchant account CRUD operations,POST/GET/PUT /accou
 Business Profile Management,Business profile CRUD operations,POST/GET/PUT /business_profile,api_models/admin.rs,covered,Cypress spec 28-BusinessProfileConfigs
 MCA Management,Merchant connector account CRUD operations,POST/GET/PUT /account/{id}/connectors,api_models/admin.rs,covered,Cypress spec 03-ConnectorCreate
 Browser Info Collection,Browser information for 3DS and fraud detection,POST /payments (browser_info in body),router_request_types.rs:browser_info,covered,Sent in all 3DS payment tests
-Order Details,Order line item details,POST /payments (order_details in body),api_models/payments.rs:order_details,not_covered,
+Order Details,Order line item details,POST /payments (order_details in body),api_models/payments.rs:order_details,covered,
 Customer Acceptance,Customer acceptance for mandates/T&C,POST /payments (customer_acceptance in body),api_models/payments.rs:customer_acceptance,covered,Tested in all mandate flows
 Off Session Payments,Off-session (merchant-initiated) payment indicator,POST /payments (off_session=true),api_models/payments.rs:off_session,covered,Tested in MIT mandate flows
 Feature Metadata,Generic feature metadata on payments,POST /payments (feature_metadata in body),api_models/payments.rs:feature_metadata,covered,

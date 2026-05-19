@@ -493,16 +493,16 @@ stripe,BankDebit,Becs,Mandate,"Recurring/stored credential mandate setup for thi
 stripe,BankDebit,Sepa,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 stripe,BankDebit,Sepa,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
 stripe,BankRedirect,BancontactCard,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-stripe,BankRedirect,BancontactCard,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
+stripe,BankRedirect,BancontactCard,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 stripe,BankRedirect,Blik,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Eps,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Giropay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Ideal,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-stripe,BankRedirect,Ideal,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
+stripe,BankRedirect,Ideal,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 stripe,BankRedirect,OnlineBankingFpx,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Przelewy24,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankRedirect,Sofort,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
-stripe,BankRedirect,Sofort,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",not_covered
+stripe,BankRedirect,Sofort,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 stripe,BankTransfer,Ach,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankTransfer,Bacs,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,BankTransfer,Multibanco,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered

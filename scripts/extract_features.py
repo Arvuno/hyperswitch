@@ -747,6 +747,8 @@ UTILS_INCLUDE_FEATURE_MAP = {
     "MIT_WITH_LIMITED_CARD_DATA":        None,   # B3: MIT With Limited Card Data
     "REFUND_MANUAL_UPDATE":              None,   # B3: Refund Manual Update
     "FEATURE_METADATA":                  None,   # B3: Feature Metadata
+    "ORDER_DETAILS":                     None,   # B3: Order Details (spec exists; B3 status set via FEATURE_SPEC_PATTERNS)
+    "RELAY_OPERATIONS":                  None,   # B3: Relay Operations (spec exists; B3 status set via FEATURE_SPEC_PATTERNS)
 
     # ---- B2: PM-level coverage — not a per-connector B1 flag ----
     "BANK_DEBIT":                        None,   # B2: BankDebit PM coverage
@@ -923,6 +925,8 @@ FEATURE_SPEC_PATTERNS = {
     "L2/L3 Data Processing":       [r"L2L3Data", r"L2L3", r"LevelTwo", r"LevelThree"],
     "Step Up Authentication":      [r"StepUpAuth", r"step.up auth"],
     "Step Up Retry":               [r"StepUpRetr", r"step.up retry", r"step.up retries"],
+    "Order Details":               [r"OrderDetails", r"order.details", r"52-orderdetails"],
+    "Relay Operations":            [r"RelayOperations", r"relay.operations", r"52-relayoperations"],
 
     # ---- B3 features covered implicitly by StepUpAuth spec ----
     # 47-StepUpAuth.cy.js calls UpdateBusinessProfileTest with merchant_country_code
