@@ -1,5 +1,5 @@
 bucket,description,total_rows,unique_features,unique_connectors,unique_payment_methods,unique_pm_types,cypress_covered,cypress_not_covered,cypress_no_config,cypress_coverage_pct
 Bucket 1,"Connector × Feature (payload-level, PM-agnostic)",160,22,74,,,110,33,17,69%
 Bucket 2,Connector × PM × PMT × Feature,683,117,114,16,115,346,235,102,51%
-Bucket 3,Core features (connector-agnostic),97,97,,,,53,44,,55%
-TOTAL,All buckets combined,940,,,,,509,312,119,54%
+Bucket 3,Core features (connector-agnostic),97,97,,,,54,43,,56%
+TOTAL,All buckets combined,940,,,,,510,311,119,54%

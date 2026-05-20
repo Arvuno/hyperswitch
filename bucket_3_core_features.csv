@@ -58,7 +58,7 @@ Subscription Management,Subscription CRUD and lifecycle management,POST/GET/PUT 
 Dispute Management,Dispute accept/defend/submit evidence,POST /disputes/{id}/accept + POST /disputes/{id}/evidence,api_models/disputes.rs,covered,
 FRM (Fraud Risk Management),Fraud check flows,POST /payments (internal FRM check),merchant_connector_account.rs:frm_configs,not_covered,
 Network Tokenization Credentials,Credentials for network tokenization,POST /business_profile (network_tokenization_credentials),business_profile.rs:network_tokenization_credentials,not_covered,
-OIDC Authentication,OpenID Connect authentication for users,POST /oidc/token,api_models/oidc.rs,not_covered,
+OIDC Authentication,OpenID Connect authentication for users,POST /oidc/token,api_models/oidc.rs,covered,
 Card Issuer Management,Card issuer CRUD operations,POST/GET/PUT /card_issuers,api_models/card_issuer.rs,covered,
 Payment Method Operations,Payment method CRUD and listing,GET /payment_methods + POST /payment_methods,api_models/payment_methods.rs,covered,Cypress spec 24-PaymentMethods
 Organization Management,Organization CRUD operations,POST/GET/PUT /organization,api_models/organization.rs,covered,Cypress spec 00-CoreFlows

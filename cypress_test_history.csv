@@ -67,4 +67,5 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2026.05.19.0,2,stripe,BankRedirect,Sofort,Mandate
 2026.05.19.0,3,,,,Order Details
 2026.05.19.0,3,,,,Relay Operations
+2026.05.20.0,3,,,,OIDC Authentication
 2026.05.20.0,3,,,,Payment Link
