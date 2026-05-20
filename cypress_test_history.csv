@@ -1,4 +1,23 @@
 covered_in_tag,bucket,connector,pm,pmt,feature
+2026.05.04.0,1,checkout,,,Partial Authorization
+2026.05.04.0,1,nuvei,,,Partial Authorization
+2026.05.04.0,1,worldpayvantiv,,,Partial Authorization
+2026.05.05.0,2,aci,PayLater,Klarna,Payment
+2026.05.05.0,2,adyen,PayLater,Klarna,Payment
+2026.05.05.0,2,klarna,PayLater,Klarna,Payment
+2026.05.05.0,2,stripe,PayLater,Klarna,Payment
+2026.05.05.0,3,,,,Card Issuer Management
+2026.05.05.0,3,,,,Connector Metadata
+2026.05.05.0,3,,,,Feature Metadata
+2026.05.05.0,3,,,,Session Expiry
+2026.05.05.0,3,,,,Use Billing As PM Billing
+2026.05.07.0,1,adyen,,,Extended Authorization
+2026.05.07.0,1,paypal,,,Extended Authorization
+2026.05.07.0,2,adyen,BankDebit,Ach,Payment
+2026.05.07.0,2,adyen,BankDebit,Bacs,Payment
+2026.05.07.0,2,adyen,BankDebit,Sepa,Payment
+2026.05.07.0,3,,,,Dynamic Routing
+2026.05.07.0,3,,,,Routing Result Source
 2026.05.11.0,2,airwallex,PayLater,Klarna,Payment
 2026.05.11.0,2,mollie,PayLater,Klarna,Payment
 2026.05.11.0,3,,,,Routing Evaluate
@@ -48,3 +67,4 @@ covered_in_tag,bucket,connector,pm,pmt,feature
 2026.05.19.0,2,stripe,BankRedirect,Sofort,Mandate
 2026.05.19.0,3,,,,Order Details
 2026.05.19.0,3,,,,Relay Operations
+2026.05.20.0,3,,,,Payment Link

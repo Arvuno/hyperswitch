@@ -511,7 +511,7 @@ stripe,Card,Credit,Payment,"Base payment authorization for this connector + PM +
 stripe,Card,Credit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
 stripe,Card,Debit,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,Card,Debit,Mandate,"Recurring/stored credential mandate setup for this connector + PM + PMT combination","POST /payments (setup_future_usage+mandate_data)",covered
-stripe,PayLater,Affirm,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
+stripe,PayLater,Affirm,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,PayLater,AfterpayClearpay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered
 stripe,PayLater,Klarna,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,covered
 stripe,Wallet,AliPay,Payment,"Base payment authorization for this connector + PM + PMT combination",POST /payments,not_covered

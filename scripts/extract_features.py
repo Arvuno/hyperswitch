@@ -753,6 +753,7 @@ UTILS_INCLUDE_FEATURE_MAP = {
     # ---- B2: PM-level coverage — not a per-connector B1 flag ----
     "BANK_DEBIT":                        None,   # B2: BankDebit PM coverage
     "PAY_LATER":                         None,   # B2: PayLater PM coverage
+    "AFFIRM":                            None,   # B2: PayLater/Affirm sub-test (covered via pay_later_pm)
     "ALIPAY_HK_WALLET":                  None,   # B2: Wallet/AliPayHk (already covered via wallet_pm)
     "BLUECODE_WALLET":                   None,   # B2: Wallet/Bluecode (already covered)
     "MIFINITY_WALLET":                   None,   # B2: Wallet/Mifinity (already covered)
@@ -761,6 +762,8 @@ UTILS_INCLUDE_FEATURE_MAP = {
 
     # ---- B3: B3 feature, detected via FEATURE_SPEC_PATTERNS ----
     "CARD_TESTING_GUARD":                None,   # B3: Card Testing Guard
+    "PAYMENT_LINK_CARD":                 None,   # B3: Payment Link (spec detected via PaymentLink pattern)
+    "POLL_CONFIG":                       None,   # B3: Poll Config (spec detected via PollConfig pattern)
 
     # ---- Structural: test infrastructure, no corresponding feature row ----
     "DDC_RACE_CONDITION":                None,   # worldpay DDC timing test
@@ -906,7 +909,8 @@ FEATURE_SPEC_PATTERNS = {
     "External 3DS Authentication": [r"ExternalThreeDS", r"External3DS"],
     "Multiple Capture":           [r"MultipleCapture"],
     "Void/Cancel Payment":        [r"VoidPayment"],
-    "Payment Link":               [r"PaymentLink"],
+     "Payment Link":               [r"PaymentLink"],
+     "Poll Config":                [r"PollConfig"],
     "Iframe Redirection":         [r"Iframe"],
     "Health Check":               [r"HealthCheck"],
     "Card Testing Guard":         [r"CardTestingGuard"],
