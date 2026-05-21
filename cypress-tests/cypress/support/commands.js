@@ -3349,6 +3349,8 @@ Cypress.Commands.add(
       headers["x-connected-merchant-id"] = connectedMerchantId;
     }
 
+    globalState.set("setupFutureUsage", createConfirmPaymentBody.setup_future_usage);
+
     cy.request({
       method: "POST",
       url: `${globalState.get("baseUrl")}/payments`,
