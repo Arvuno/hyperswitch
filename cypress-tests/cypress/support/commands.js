@@ -3349,11 +3349,6 @@ Cypress.Commands.add(
       headers["x-connected-merchant-id"] = connectedMerchantId;
     }
 
-    globalState.set(
-      "setupFutureUsage",
-      createConfirmPaymentBody.setup_future_usage
-    );
-
     cy.request({
       method: "POST",
       url: `${globalState.get("baseUrl")}/payments`,
@@ -5248,7 +5243,7 @@ Cypress.Commands.add("listCustomerPMCallTest", (globalState, order = 0) => {
 
 Cypress.Commands.add("listCustomerPMByClientSecret", (globalState) => {
   const clientSecret = globalState.get("clientSecret");
-  const setupFutureUsage = globalState.get("setupFutureUsage");
+  const setupFutureUsage = globalState.get("actualSetupFutureUsage") || globalState.get("setupFutureUsage");
 
   cy.request({
     method: "GET",

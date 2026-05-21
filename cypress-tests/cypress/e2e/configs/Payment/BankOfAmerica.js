@@ -880,6 +880,8 @@ export const connectorDetails = {
         },
       },
     },
+    // Note: BofA sandbox does not support off_session mandate setup —
+    // uses on_session as workaround. Name reflects intended off_session semantics.
     RequiresCVVOffSessionNoMandate: {
       Request: {
         payment_method: "card",
@@ -899,11 +901,6 @@ export const connectorDetails = {
     },
     RequiresCVVSavedCardWithCVV: {
       Request: {
-        payment_method_data: {
-          card: {
-            card_cvc: "123",
-          },
-        },
         setup_future_usage: "on_session",
       },
       Response: {

@@ -1,10 +1,6 @@
 import * as fixtures from "../../../fixtures/imports";
 import State from "../../../utils/State";
-import * as utils from "../../configs/Payment/Utils";
-import getConnectorDetails, {
-  CONNECTOR_LISTS,
-  shouldIncludeConnector,
-} from "../../configs/Payment/Utils";
+import getConnectorDetails, * as utils from "../../configs/Payment/Utils";
 
 let globalState;
 let connector;
@@ -19,9 +15,9 @@ describe("Card - Requires CVV flow test", () => {
         connector = globalState.get("connectorId");
 
         if (
-          shouldIncludeConnector(
+          utils.shouldIncludeConnector(
             connector,
-            CONNECTOR_LISTS.INCLUDE.REQUIRES_CVV
+            utils.CONNECTOR_LISTS.INCLUDE.REQUIRES_CVV
           )
         ) {
           skip = true;
@@ -35,7 +31,7 @@ describe("Card - Requires CVV flow test", () => {
       });
   });
 
-  after("flush global state", () => {
+  afterEach("flush global state", () => {
     cy.task("setGlobalState", globalState.data);
   });
 
