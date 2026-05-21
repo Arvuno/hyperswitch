@@ -5243,7 +5243,9 @@ Cypress.Commands.add("listCustomerPMCallTest", (globalState, order = 0) => {
 
 Cypress.Commands.add("listCustomerPMByClientSecret", (globalState) => {
   const clientSecret = globalState.get("clientSecret");
-  const setupFutureUsage = globalState.get("actualSetupFutureUsage") || globalState.get("setupFutureUsage");
+  const setupFutureUsage =
+    globalState.get("actualSetupFutureUsage") ||
+    globalState.get("setupFutureUsage");
 
   cy.request({
     method: "GET",
