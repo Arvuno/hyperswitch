@@ -1369,6 +1369,7 @@ export const connectorDetails = {
       const skipPaymentMethods = ["Ach", "Bacs"];
       return {
         Configs: {
+          // TRIGGER_SKIP: ACH returns HTTP 500 (server bug); BACS blocked by Stripe account config
           ...(skipPaymentMethods.includes(paymentMethodType) && {
             TRIGGER_SKIP: true,
           }),
@@ -1405,16 +1406,6 @@ export const connectorDetails = {
             },
           },
         },
-        mandate_data: {
-          customer_acceptance: customerAcceptance,
-          mandate_type: {
-            single_use: {
-              amount: 1000,
-              currency: "EUR",
-            },
-          },
-        },
-        customer_acceptance: customerAcceptance,
         setup_future_usage: "off_session",
         billing: {
           address: {
@@ -1451,16 +1442,6 @@ export const connectorDetails = {
             },
           },
         },
-        mandate_data: {
-          customer_acceptance: customerAcceptance,
-          mandate_type: {
-            single_use: {
-              amount: 1000,
-              currency: "AUD",
-            },
-          },
-        },
-        customer_acceptance: customerAcceptance,
         setup_future_usage: "off_session",
         billing: {
           address: {
@@ -1482,6 +1463,7 @@ export const connectorDetails = {
     },
     Ach: {
       Configs: {
+        // TRIGGER_SKIP: ACH bank debit returns HTTP 500 from Stripe server (high severity bug)
         TRIGGER_SKIP: true,
       },
       Request: {
@@ -1512,6 +1494,7 @@ export const connectorDetails = {
     },
     Bacs: {
       Configs: {
+        // TRIGGER_SKIP: BACS requires Stripe account configuration that does not allow passing mandate_data directly
         TRIGGER_SKIP: true,
       },
       Request: {
@@ -1545,6 +1528,7 @@ export const connectorDetails = {
         CONNECTOR_CREDENTIAL: {
           value: "connector_1",
         },
+        // TRIGGER_SKIP: ACH bank debit returns HTTP 500 from Stripe server (high severity bug)
         TRIGGER_SKIP: true,
       },
       Request: {
@@ -1591,6 +1575,7 @@ export const connectorDetails = {
         CONNECTOR_CREDENTIAL: {
           value: "connector_3",
         },
+        // TRIGGER_SKIP: BACS requires Stripe account configuration that does not allow passing mandate_data directly
         TRIGGER_SKIP: true,
       },
       Request: {
@@ -1727,7 +1712,7 @@ export const connectorDetails = {
         },
       },
     },
-    MITAutoCapture: {
+    MITAutoCaptureSepa: {
       Configs: {
         CONNECTOR_CREDENTIAL: {
           value: "connector_5",
@@ -1768,6 +1753,7 @@ export const connectorDetails = {
         CONNECTOR_CREDENTIAL: {
           value: "connector_1",
         },
+        // TRIGGER_SKIP: ACH bank debit returns HTTP 500 from Stripe server (high severity bug)
         TRIGGER_SKIP: true,
       },
       Request: {
@@ -1782,11 +1768,12 @@ export const connectorDetails = {
         },
       },
     },
-    MITAutoCaptureGbp: {
+    MITAutoCaptureBacs: {
       Configs: {
         CONNECTOR_CREDENTIAL: {
           value: "connector_3",
         },
+        // TRIGGER_SKIP: BACS requires Stripe account configuration that does not allow passing mandate_data directly
         TRIGGER_SKIP: true,
       },
       Request: {
