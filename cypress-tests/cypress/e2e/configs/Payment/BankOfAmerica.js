@@ -851,7 +851,6 @@ export const connectorDetails = {
         },
         currency: "USD",
         setup_future_usage: "on_session",
-        customer_acceptance: customerAcceptance,
       },
       Response: {
         status: 200,
@@ -880,9 +879,8 @@ export const connectorDetails = {
         },
       },
     },
-    // Note: BofA sandbox does not support off_session mandate setup —
-    // uses on_session as workaround. Name reflects intended off_session semantics.
-    RequiresCVVOffSessionNoMandate: {
+    // BofA sandbox does not support off_session mandate setup - uses on_session as workaround
+    RequiresCVVOnSessionNoMandate: {
       Request: {
         payment_method: "card",
         payment_method_data: {
@@ -1005,7 +1003,6 @@ export const connectorDetails = {
     RequiresCVVPaymentIntent: {
       Request: {
         currency: "USD",
-        setup_future_usage: "on_session",
         customer_acceptance: null,
       },
       Response: {

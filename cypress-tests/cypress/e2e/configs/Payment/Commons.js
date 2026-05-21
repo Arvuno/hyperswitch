@@ -2982,7 +2982,6 @@ export const connectorDetails = {
     RequiresCVVPaymentIntent: getCustomExchange({
       Request: {
         currency: "USD",
-        setup_future_usage: "on_session",
         customer_acceptance: null,
       },
       Response: {
@@ -3000,7 +2999,6 @@ export const connectorDetails = {
         },
         currency: "USD",
         setup_future_usage: "on_session",
-        customer_acceptance: customerAcceptance,
       },
       Response: {
         status: 200,
@@ -3010,9 +3008,6 @@ export const connectorDetails = {
       },
     }),
     RequiresCVVOffSessionMandate: getCustomExchange({
-      Configs: {
-        TRIGGER_SKIP: true,
-      },
       Request: {
         payment_method: "card",
         payment_method_data: {
@@ -3029,9 +3024,7 @@ export const connectorDetails = {
         },
       },
     }),
-    // Note: BofA sandbox does not support off_session mandate setup —
-    // uses on_session as workaround. Name reflects intended off_session semantics.
-    RequiresCVVOffSessionNoMandate: getCustomExchange({
+    RequiresCVVOnSessionNoMandate: getCustomExchange({
       Request: {
         payment_method: "card",
         payment_method_data: {
@@ -3060,9 +3053,6 @@ export const connectorDetails = {
       },
     }),
     RequiresCVVSavedCardWithoutCVV: getCustomExchange({
-      Configs: {
-        TRIGGER_SKIP: true,
-      },
       Request: {
         setup_future_usage: "off_session",
       },
