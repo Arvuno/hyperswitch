@@ -612,6 +612,7 @@ export const CONNECTOR_LISTS = {
       "worldpayvantiv",
     ],
     POLL_CONFIG: ["stripe"],
+    REQUIRES_CVV: ["bankofamerica"],
     // Add more inclusion lists
   },
 };

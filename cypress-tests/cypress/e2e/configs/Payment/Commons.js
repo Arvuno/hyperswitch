@@ -2979,6 +2979,164 @@ export const connectorDetails = {
         },
       },
     }),
+    RequiresCVVPaymentIntent: getCustomExchange({
+      Request: {
+        currency: "USD",
+        setup_future_usage: "on_session",
+        customer_acceptance: null,
+      },
+      Response: {
+        status: 200,
+        body: {
+          status: "requires_payment_method",
+        },
+      },
+    }),
+    RequiresCVVOnSession: getCustomExchange({
+      Request: {
+        payment_method: "card",
+        payment_method_data: {
+          card: successfulNo3DSCardDetails,
+        },
+        currency: "USD",
+        setup_future_usage: "on_session",
+        customer_acceptance: customerAcceptance,
+      },
+      Response: {
+        status: 200,
+        body: {
+          status: "succeeded",
+        },
+      },
+    }),
+    RequiresCVVOffSessionMandate: getCustomExchange({
+      Configs: {
+        TRIGGER_SKIP: true,
+      },
+      Request: {
+        payment_method: "card",
+        payment_method_data: {
+          card: successfulNo3DSCardDetails,
+        },
+        currency: "USD",
+        setup_future_usage: "off_session",
+        customer_acceptance: customerAcceptance,
+      },
+    }),
+    RequiresCVVOffSessionNoMandate: getCustomExchange({
+      Request: {
+        payment_method: "card",
+        payment_method_data: {
+          card: successfulNo3DSCardDetails,
+        },
+        currency: "USD",
+        setup_future_usage: "on_session",
+        customer_acceptance: customerAcceptance,
+      },
+      Response: {
+        status: 200,
+        body: {
+          status: "succeeded",
+        },
+      },
+    }),
+    RequiresCVVSavedCardWithCVV: getCustomExchange({
+      Request: {
+        setup_future_usage: "on_session",
+      },
+      Response: {
+        status: 200,
+        body: {
+          status: "succeeded",
+        },
+      },
+    }),
+    RequiresCVVSavedCardWithoutCVV: getCustomExchange({
+      Configs: {
+        TRIGGER_SKIP: true,
+      },
+      Request: {
+        setup_future_usage: "off_session",
+      },
+    }),
+    RequiresCVVInvalidCVVShort: getCustomExchange({
+      Request: {
+        payment_method: "card",
+        payment_method_data: {
+          card: {
+            card_number: "4242424242424242",
+            card_exp_month: "12",
+            card_exp_year: "2030",
+            card_holder_name: "Test User",
+            card_cvc: "12",
+          },
+        },
+        currency: "USD",
+        customer_acceptance: customerAcceptance,
+      },
+      Response: {
+        status: 400,
+        body: {
+          error: {
+            type: "invalid_request",
+            code: "IR_16",
+            message: "Invalid card_cvc length",
+          },
+        },
+      },
+    }),
+    RequiresCVVInvalidCVVLong: getCustomExchange({
+      Request: {
+        payment_method: "card",
+        payment_method_data: {
+          card: {
+            card_number: "4242424242424242",
+            card_exp_month: "12",
+            card_exp_year: "2030",
+            card_holder_name: "Test User",
+            card_cvc: "12345",
+          },
+        },
+        currency: "USD",
+        customer_acceptance: customerAcceptance,
+      },
+      Response: {
+        status: 400,
+        body: {
+          error: {
+            type: "invalid_request",
+            code: "IR_16",
+            message: "Invalid card_cvc length",
+          },
+        },
+      },
+    }),
+    RequiresCVVInvalidCVVNonNumeric: getCustomExchange({
+      Request: {
+        payment_method: "card",
+        payment_method_data: {
+          card: {
+            card_number: "4242424242424242",
+            card_exp_month: "12",
+            card_exp_year: "2030",
+            card_holder_name: "Test User",
+            card_cvc: "abc",
+          },
+        },
+        currency: "USD",
+        customer_acceptance: customerAcceptance,
+      },
+      Response: {
+        status: 400,
+        body: {
+          error: {
+            type: "invalid_request",
+            code: "IR_07",
+            message: "Invalid value provided: card_cvc",
+          },
+        },
+      },
+    }),
   },
   upi_pm: {
     PaymentIntent: getCustomExchange({
