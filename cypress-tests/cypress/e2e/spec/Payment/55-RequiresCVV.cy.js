@@ -139,9 +139,6 @@ describe("Card - Requires CVV flow test", () => {
           "automatic",
           globalState
         );
-        if (!utils.should_continue_further(data)) {
-          shouldContinue = false;
-        }
       });
 
       cy.step("Retrieve Payment after Confirm", () => {
