@@ -150,9 +150,6 @@ describe("Card - Requires CVV flow test", () => {
           "card_pm"
         ]["RequiresCVVOffSessionMandate"];
         cy.retrievePaymentCallTest({ globalState, data });
-        if (!utils.should_continue_further(data)) {
-          shouldContinue = false;
-        }
       });
 
       cy.step("List Customer Payment Methods", () => {
