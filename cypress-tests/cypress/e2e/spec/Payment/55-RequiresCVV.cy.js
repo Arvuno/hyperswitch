@@ -124,6 +124,11 @@ describe("Card - Requires CVV flow test", () => {
         const data = getConnectorDetails(globalState.get("connectorId"))[
           "card_pm"
         ]["RequiresCVVOffSessionMandate"];
+        if (!utils.should_continue_further(data)) {
+          shouldContinue = false;
+          cy.task("cli_log", "Skipping step: Create and Confirm Payment (TRIGGER_SKIP)");
+          return;
+        }
         cy.createConfirmPaymentTest(
           fixtures.createConfirmPaymentBody,
           data,
@@ -192,7 +197,7 @@ describe("Card - Requires CVV flow test", () => {
     });
   });
 
-  context("Off-session without mandate requires CVV", () => {
+  context("Saved card confirm without mandate requires CVV (on_session, BofA workaround for off_session)", () => {
     it("Create Customer -> Create+Confirm Payment (on_session save) -> Retrieve -> List PMs -> Create PI (off_session) -> Save Card Confirm (with CVV) -> Retrieve", () => {
       let shouldContinue = true;
 
