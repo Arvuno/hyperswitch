@@ -83,6 +83,7 @@ EXCLUDED_FEATURES_BUCKET3 = {
     "Split Transactions Enabled",
     "Process Tracker Mapping",
     "Payout Tracker Mapping",   # Not testable via Cypress
+    "CVV Collection During Payment",  # v2 feature — not testable via Cypress
 }
 
 
