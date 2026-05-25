@@ -82,6 +82,9 @@ EXCLUDED_FEATURES_BUCKET3 = {
     "Process Tracker Mapping",       # Not testable via Cypress
     "Payout Tracker Mapping",        # Not testable via Cypress
     "CVV Collection During Payment", # v2 feature
+    "Dispute Polling Interval",      # Not possible in Cypress
+    "FRM Routing Algorithm",         # Internal flow
+    "Sub-Merchants",                 # Deprecated feature
 }
 
 

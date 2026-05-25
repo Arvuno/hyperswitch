@@ -86,6 +86,9 @@ EXCLUDED_FEATURES_BUCKET3 = {
     "Process Tracker Mapping",       # Not testable via Cypress
     "Payout Tracker Mapping",        # Not testable via Cypress
     "CVV Collection During Payment", # v2 feature
+    "Dispute Polling Interval",      # Not possible in Cypress
+    "FRM Routing Algorithm",         # Internal flow
+    "Sub-Merchants",                 # Deprecated feature
 }
 
 
@@ -882,7 +885,7 @@ FEATURE_SPEC_PATTERNS = {
     "Routing Algorithm":          [r"PriorityRouting", r"VolumeBasedRouting", r"RuleBasedRouting"],
     "Default Fallback Routing":   [r"DefaultRouting", r"FallbackRouting"],
     "Dynamic Routing":            [r"DynamicRouting"],
-    "Conditional Routing DSL":    [r"ConditionalRouting", r"RoutingDSL"],
+    "Conditional Routing DSL":    [r"ConditionalRouting", r"RoutingDSL", r"RuleBasedRouting", r"Rule Based Routing"],
     "FRM Routing Algorithm":      [r"FRMRouting", r"FraudRouting"],
     "Payout Routing Algorithm":   [r"PayoutRouting"],
     "3DS Decision Rule Algorithm": [r"3DSDecisionRule", r"ThreeDSDecisionRule"],
@@ -919,9 +922,12 @@ FEATURE_SPEC_PATTERNS = {
     "Multiple Capture":           [r"MultipleCapture"],
     "Void/Cancel Payment":        [r"VoidPayment"],
      "Payment Link":               [r"PaymentLink"],
-      "Poll Config":                [r"PollConfig"],
-      "PM Collect Link":            [r"paymentMethodCollect", r"Payment Method Collect Link", r"pm_collect_link"],
-      "Refund Manual Update":       [r"RefundManualUpdate", r"Refund Manual Update"],
+     "Poll Config":                [r"PollConfig"],
+     "PM Collect Link":            [r"paymentMethodCollect", r"Payment Method Collect Link", r"pm_collect_link"],
+     "Refund Manual Update":       [r"RefundManualUpdate", r"Refund Manual Update"],
+     "Surcharge DSL":              [r"SurchargeDSL", r"Surcharge DSL"],
+     "MIT With Limited Card Data": [r"MITWithLimitedCardData", r"MIT with Limited Card Data", r"mit-card-limited"],
+     "PM Modular Service":         [r"ModularPmService", r"Modular PM Service", r"pm_modular"],
      "OIDC Authentication":        [r"Oidc"],
      "Iframe Redirection":         [r"Iframe"],
     "Health Check":               [r"HealthCheck"],
