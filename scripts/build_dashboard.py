@@ -73,6 +73,9 @@ EXCLUDED_FLOW_COMBINATIONS = {
     ("checkout",       "Dispute Accept"),
     ("checkout",       "Dispute Defend"),
     ("worldpayvantiv", "Dispute Accept"),
+    # Split Payments — creds not available to test
+    ("adyen",          "Split Payments"),
+    ("xendit",         "Split Payments"),
 }
 
 # Features to exclude from Bucket 3
