@@ -86,6 +86,7 @@ EXCLUDED_FLOW_COMBINATIONS = {
 EXCLUDED_FEATURES_BUCKET3 = {
     "Split Transactions Enabled",
     "Process Tracker Mapping",  # Retry schedule for sync operations
+    "Payout Tracker Mapping",   # Not testable via Cypress
 }
 
 
@@ -754,7 +755,7 @@ UTILS_INCLUDE_FEATURE_MAP = {
     "AUTH_SERVICE_ELIGIBILITY":          None,   # B3: Authentication Service Eligibility
     "USE_BILLING_AS_PAYMENT_METHOD_BILLING": None,  # B3: Use Billing As PM Billing
     "MIT_WITH_LIMITED_CARD_DATA":        None,   # B3: MIT With Limited Card Data
-    "REFUND_MANUAL_UPDATE":              None,   # B3: Refund Manual Update
+    "REFUND_MANUAL_UPDATE":              None,   # B3: Refund Manual Update (detected via FEATURE_SPEC_PATTERNS)
     "FEATURE_METADATA":                  None,   # B3: Feature Metadata
     "ORDER_DETAILS":                     None,   # B3: Order Details (spec exists; B3 status set via FEATURE_SPEC_PATTERNS)
     "RELAY_OPERATIONS":                  None,   # B3: Relay Operations (spec exists; B3 status set via FEATURE_SPEC_PATTERNS)
@@ -921,6 +922,7 @@ FEATURE_SPEC_PATTERNS = {
      "Payment Link":               [r"PaymentLink"],
       "Poll Config":                [r"PollConfig"],
       "PM Collect Link":            [r"paymentMethodCollect", r"Payment Method Collect Link", r"pm_collect_link"],
+      "Refund Manual Update":       [r"RefundManualUpdate", r"Refund Manual Update"],
      "OIDC Authentication":        [r"Oidc"],
      "Iframe Redirection":         [r"Iframe"],
     "Health Check":               [r"HealthCheck"],

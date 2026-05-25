@@ -82,6 +82,7 @@ EXCLUDED_FLOW_COMBINATIONS = {
 EXCLUDED_FEATURES_BUCKET3 = {
     "Split Transactions Enabled",
     "Process Tracker Mapping",
+    "Payout Tracker Mapping",   # Not testable via Cypress
 }
 
 
