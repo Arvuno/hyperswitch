@@ -48,42 +48,40 @@ EXCLUDED_PM_TYPES_BUCKET2 = {"GooglePay", "ApplePay"}
 
 # Specific connector + flow combinations to exclude
 EXCLUDED_FLOW_COMBINATIONS = {
-    ("airwallex", "Order Create Flow"),
-    ("nordea", "Order Create Flow"),
-    ("payme", "Order Create Flow"),
-    ("razorpay", "Order Create Flow"),
-    ("trustpay", "Order Create Flow"),
-    ("amazonpay", "Refund"),
-    ("bitpay", "Refund"),
-    ("coingate", "Refund"),
-    ("gigadat", "Refund"),
-    ("itaubank", "Refund"),
-    ("klarna", "Refund"),
-    ("loonio", "Refund"),
-    ("razorpay", "Refund"),
-    ("santander", "Refund"),
-    ("stripe", "Overcapture"),
-    ("revolv3", "Refund"),
-    ("truelayer", "Refund"),
-    ("trustly", "Refund"),
-    ("adyen", "Split Refunds"),
-    # Dispute Accept/Defend — not testable via Cypress
-    ("adyen",          "Dispute Accept"),
-    ("adyen",          "Dispute Defend"),
-    ("checkout",       "Dispute Accept"),
-    ("checkout",       "Dispute Defend"),
-    ("worldpayvantiv", "Dispute Accept"),
-    # Split Payments — creds not available to test
-    ("adyen",          "Split Payments"),
-    ("xendit",         "Split Payments"),
+    ("airwallex", "Order Create Flow"),   # Internal flow
+    ("nordea",    "Order Create Flow"),   # Internal flow
+    ("payme",     "Order Create Flow"),   # Internal flow
+    ("razorpay",  "Order Create Flow"),   # Internal flow
+    ("trustpay",  "Order Create Flow"),   # Internal flow
+    ("amazonpay", "Refund"),              # Not possible to verify e2e cases
+    ("bitpay",    "Refund"),              # Not possible to verify e2e cases
+    ("coingate",  "Refund"),              # Not possible to verify e2e cases
+    ("gigadat",   "Refund"),              # Not possible to verify e2e cases
+    ("itaubank",  "Refund"),              # Not possible to verify e2e cases
+    ("klarna",    "Refund"),              # Not possible to verify e2e cases
+    ("loonio",    "Refund"),              # Not possible to verify e2e cases
+    ("razorpay",  "Refund"),              # Not possible to verify e2e cases
+    ("santander", "Refund"),              # Not possible to verify e2e cases
+    ("stripe",    "Overcapture"),         # Creds not available
+    ("revolv3",   "Refund"),              # UCS only connector
+    ("truelayer", "Refund"),              # UCS only connector
+    ("trustly",   "Refund"),              # UCS only connector
+    ("adyen",     "Split Refunds"),       # Creds not available
+    ("adyen",          "Dispute Accept"), # No connector config data
+    ("adyen",          "Dispute Defend"), # No connector config data
+    ("checkout",       "Dispute Accept"), # No connector config data
+    ("checkout",       "Dispute Defend"), # No connector config data
+    ("worldpayvantiv", "Dispute Accept"), # No connector config data
+    ("adyen",          "Split Payments"), # Creds not available
+    ("xendit",         "Split Payments"), # Creds not available
 }
 
 # Features to exclude from Bucket 3
 EXCLUDED_FEATURES_BUCKET3 = {
-    "Split Transactions Enabled",
-    "Process Tracker Mapping",
-    "Payout Tracker Mapping",   # Not testable via Cypress
-    "CVV Collection During Payment",  # v2 feature — not testable via Cypress
+    "Split Transactions Enabled",    # Creds not available
+    "Process Tracker Mapping",       # Not testable via Cypress
+    "Payout Tracker Mapping",        # Not testable via Cypress
+    "CVV Collection During Payment", # v2 feature
 }
 
 
