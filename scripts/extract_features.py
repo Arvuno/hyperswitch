@@ -928,7 +928,7 @@ FEATURE_SPEC_PATTERNS = {
     "Health Check":               [r"HealthCheck"],
     "Card Testing Guard":         [r"CardTestingGuard"],
     "Payment Method Operations":  [r"PaymentMethodList", r"PaymentMethodCreate"],
-    "SDK Client Token Generation": [r"SessionToken", r"ClientToken"],
+    "SDK Client Token Generation": [r"SessionCall", r"session-call", r"SessionToken", r"ClientToken"],
     "Dispute Management":         [r"DisputeTests", r"\bDispute\b"],
     "FRM (Fraud Risk Management)": [r"FRM", r"FraudCheck"],
 
