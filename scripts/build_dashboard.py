@@ -67,6 +67,12 @@ EXCLUDED_FLOW_COMBINATIONS = {
     ("truelayer", "Refund"),
     ("trustly", "Refund"),
     ("adyen", "Split Refunds"),
+    # Dispute Accept/Defend — not testable via Cypress
+    ("adyen",          "Dispute Accept"),
+    ("adyen",          "Dispute Defend"),
+    ("checkout",       "Dispute Accept"),
+    ("checkout",       "Dispute Defend"),
+    ("worldpayvantiv", "Dispute Accept"),
 }
 
 # Features to exclude from Bucket 3
