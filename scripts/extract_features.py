@@ -82,7 +82,7 @@ EXCLUDED_FLOW_COMBINATIONS = {
 
 # Features to exclude from Bucket 3
 EXCLUDED_FEATURES_BUCKET3 = {
-    "Split Transactions Enabled",    # Creds not available
+    "Split Transactions Enabled",    # v2 feature
     "Process Tracker Mapping",       # Not testable via Cypress
     "Payout Tracker Mapping",        # Not testable via Cypress
     "CVV Collection During Payment", # v2 feature
