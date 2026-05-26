@@ -3025,23 +3025,6 @@ export const connectorDetails = {
         },
       },
     }),
-    RequiresCVVOnSessionNoMandate: getCustomExchange({
-      Request: {
-        payment_method: "card",
-        payment_method_data: {
-          card: successfulNo3DSCardDetails,
-        },
-        currency: "USD",
-        setup_future_usage: "on_session",
-        customer_acceptance: customerAcceptance,
-      },
-      Response: {
-        status: 200,
-        body: {
-          status: "succeeded",
-        },
-      },
-    }),
     RequiresCVVSavedCardWithCVV: getCustomExchange({
       Request: {
         setup_future_usage: "on_session",

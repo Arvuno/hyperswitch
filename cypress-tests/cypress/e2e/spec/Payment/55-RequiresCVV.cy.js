@@ -3,9 +3,9 @@ import State from "../../../utils/State";
 import getConnectorDetails, * as utils from "../../configs/Payment/Utils";
 
 let globalState;
-let connector;
 
 describe("Card - Requires CVV flow test", () => {
+  let connector;
   before("seed global state", function () {
     let skip = false;
 
@@ -211,7 +211,7 @@ describe("Card - Requires CVV flow test", () => {
           }
           const data = getConnectorDetails(globalState.get("connectorId"))[
             "card_pm"
-          ]["RequiresCVVOnSessionNoMandate"];
+          ]["RequiresCVVOnSession"];
           cy.createConfirmPaymentTest(
             fixtures.createConfirmPaymentBody,
             data,
@@ -231,7 +231,7 @@ describe("Card - Requires CVV flow test", () => {
           }
           const data = getConnectorDetails(globalState.get("connectorId"))[
             "card_pm"
-          ]["RequiresCVVOnSessionNoMandate"];
+          ]["RequiresCVVOnSession"];
           cy.retrievePaymentCallTest({ globalState, data });
           if (!utils.should_continue_further(data)) {
             shouldContinue = false;
